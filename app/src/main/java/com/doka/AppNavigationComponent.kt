@@ -2,6 +2,7 @@ package com.doka
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,15 +24,22 @@ fun NavigationComponent(
         }.launchIn(this)
     }
 
+    val vm: MainViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = NavTarget.ImageSource.label
     ) {
+
         composable(NavTarget.ImageSource.label) {
-            ImageSourceScreen(navigateNext = { navigator.navigateTo(NavTarget.Edit) })
+            ImageSourceScreen(
+                navigateNext = { navigator.navigateTo(NavTarget.Edit) },
+                viewModel = vm
+            )
         }
         composable(NavTarget.Edit.label) {
-            EditScreen()
+            EditScreen(viewModel = vm)
         }
+
     }
 }

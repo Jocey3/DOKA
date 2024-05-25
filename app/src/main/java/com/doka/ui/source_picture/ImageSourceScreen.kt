@@ -56,7 +56,7 @@ import java.io.IOException
 
 @Composable
 fun ImageSourceScreen(
-    navigateNext: () -> Unit,
+    navigateNext: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
