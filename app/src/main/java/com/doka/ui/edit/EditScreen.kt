@@ -1,10 +1,10 @@
 package com.doka.ui.edit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -16,12 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -34,17 +31,19 @@ import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
-import com.doka.R
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
@@ -57,121 +56,164 @@ import kotlin.math.sin
 
 @Composable
 fun EditScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
-    val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    var zoom by remember { mutableStateOf(1f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
-    var angle by remember { mutableStateOf(0f) }
-
-
-    Box(
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark),
-        contentAlignment = Alignment.Center
+            .background(RudeDark)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp))
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(width = 179.dp, height = 127.dp)
-                        .border(2.dp, RectangleBorderColor, RoundedCornerShape(8.dp))
+        val (mainFrame, bottomPanel) = createRefs()
 
-                ) {
-                    viewModel.currentBitmap?.let {
+        Box(
+            modifier = Modifier
+                .constrainAs(mainFrame) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(bottomPanel.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
 
-                        Image(
-                            it.asImageBitmap(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .graphicsLayer {
-                                    translationX = -offset.x * zoom
-                                    translationY = -offset.y * zoom
-                                    scaleX = zoom
-                                    scaleY = zoom
-                                    rotationZ = angle
-                                    TransformOrigin(0f, 0f).also { transformOrigin = it }
-                                },
-                            contentDescription = "Image for edit",
-                            contentScale = ContentScale.Crop
-
-                        )
-                    } ?: run {
-
-                        Image(
-                            painterResource(id = R.drawable.ic_launcher_foreground),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
-                            contentDescription = "Image for edit",
-                            contentScale = ContentScale.Crop
-
-                        )
-                    }
-
+                    // Adding vertical bias to center mainFrame in the available space
+                    top.linkTo(parent.top)
+                    bottom.linkTo(bottomPanel.top)
+                    verticalChainWeight = 0.5f
                 }
-            }
-
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .background(
-                    color = RudeMid,
-                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-                )
-                .padding(16.dp)
-
         ) {
+            MainFrame(viewModel = viewModel)
+        }
 
-            Box(
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .size(width = 234.dp, height = 139.dp)
-                    .background(
-                        color = RudeLight,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .pointerInput(Unit) {
-                        detectTransformGestures(
-                            onGesture = { gestureCentroid, gesturePan, gestureZoom, gestureRotate ->
-                                val oldScale = zoom
-                                val newScale = (zoom * gestureZoom).coerceIn(0.5f..5f)
-
-                                // For natural zooming and rotating, the centroid of the gesture should
-                                // be the fixed point where zooming and rotating occurs.
-                                // We compute where the centroid was (in the pre-transformed coordinate
-                                // space), and then compute where it will be after this delta.
-                                // We then compute what the new offset should be to keep the centroid
-                                // visually stationary for rotating and zooming, and also apply the pan.
-                                offset =
-                                    (offset + gestureCentroid / oldScale).rotateBy(gestureRotate) -
-                                            (gestureCentroid / newScale + gesturePan / oldScale)
-                                angle += gestureRotate
-                                zoom = newScale
-                            }
-                        )
-                    }
-            ) {
-
-            }
-
+        Box(
+            modifier = Modifier
+                .constrainAs(bottomPanel) {
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.percent(0.25f) // Set height to 1/4 of the screen
+                }
+        ) {
+            BottomPanel(viewModel = viewModel)
         }
     }
+}
 
+
+@Composable
+fun MainFrame(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(width = 330.dp, height = 220.dp)
+            .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp))
+            .onGloballyPositioned { layoutCoordinates ->
+                // Get the size of the Box
+                viewModel.boxSize.value = layoutCoordinates.size.toSize()
+                // Get the position of the Box
+                val position = layoutCoordinates.positionInWindow()
+                viewModel.boxCoordinates.value = position.x.toInt() to position.y.toInt()
+            }
+    ) {
+        FrameWithImage(viewModel)
+    }
+}
+
+@Composable
+fun FrameWithImage(viewModel: MainViewModel) {
+    Box(
+        modifier = Modifier
+            .size(width = 179.dp, height = 127.dp)
+            .border(
+                BorderStroke(2.dp, RectangleBorderColor),
+                RoundedCornerShape(8.dp)
+            )
+            .padding(2.dp)
+            .clip(RoundedCornerShape(8.dp))
+
+
+    ) {
+        viewModel.currentBitmap?.let {
+
+            Image(
+                bitmap = it.asImageBitmap(),
+                modifier = Modifier
+                    .onGloballyPositioned { layoutCoordinates ->
+                        // Get the size of the Box
+                        viewModel.imageSize.value = layoutCoordinates.size.toSize()
+                        // Get the position of the Box
+                        val position = layoutCoordinates.positionInWindow()
+                        viewModel.imageCoordinates.value = position.x.toInt() to position.y.toInt()
+                    }
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        translationX = -viewModel.offset.value.x * viewModel.zoom.value
+                        translationY = -viewModel.offset.value.y * viewModel.zoom.value
+                        scaleX = viewModel.zoom.value
+                        scaleY = viewModel.zoom.value
+                        rotationZ = viewModel.angle.value
+                        transformOrigin = TransformOrigin(0f, 0f)
+                    },
+                contentDescription = "Image for edit",
+                contentScale = ContentScale.Crop
+            )
+        } ?: run {
+
+            Image(
+                painter = ColorPainter(Color.Green),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                contentDescription = "Image for edit",
+                contentScale = ContentScale.Crop
+
+            )
+        }
+
+    }
+}
+
+@Composable
+fun BottomPanel(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .background(
+                color = RudeMid,
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+            )
+            .padding(16.dp)
+
+    ) {
+
+        Box(
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .size(width = 234.dp, height = 139.dp)
+                .background(
+                    color = RudeLight,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .pointerInput(Unit) {
+                    detectTransformGestures(
+                        onGesture = { gestureCentroid, gesturePan, gestureZoom, gestureRotate ->
+                            val oldScale = viewModel.zoom.value
+                            val newScale =
+                                (viewModel.zoom.value * gestureZoom).coerceIn(0.5f..5f)
+
+                            viewModel.updateOffset(
+                                (viewModel.offset.value + gestureCentroid / oldScale)
+                                    .rotateBy(gestureRotate) -
+                                        (gestureCentroid / newScale + gesturePan / oldScale)
+                            )
+                            viewModel.updateAngle(viewModel.angle.value + gestureRotate)
+                            viewModel.updateZoom(newScale)
+
+                        }
+                    )
+                }
+        ) {
+
+        }
+
+    }
 }
 
 fun Offset.rotateBy(angle: Float): Offset {

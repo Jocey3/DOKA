@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.google.dagger)
     implementation(libs.androidx.hilt)
+    implementation(libs.androidx.constraintlayout)
     kapt("com.google.dagger:hilt-android-compiler:2.45")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
