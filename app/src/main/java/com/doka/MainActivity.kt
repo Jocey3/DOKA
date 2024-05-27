@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.doka.ui.source_picture.ImageSourceScreen
+import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.theme.DOKATheme
 import dagger.hilt.android.AndroidEntryPoint
 

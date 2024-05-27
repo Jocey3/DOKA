@@ -7,8 +7,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.doka.ui.edit.EditScreen
-import com.doka.ui.source_picture.ImageSourceScreen
+import com.doka.ui.screens.edit.EditScreen
+import com.doka.ui.screens.source_picture.ImageSourceScreen
+import com.doka.ui.screens.splash.SplashScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -28,12 +29,18 @@ fun NavigationComponent(
 
     NavHost(
         navController = navController,
-        startDestination = NavTarget.ImageSource.label
+        startDestination = NavTarget.Splash.label
     ) {
-
+        composable(NavTarget.Splash.label) {
+            SplashScreen(
+                navigateNext = { navigator.navigateTo(NavTarget.ImageSource) },
+                viewModel = vm
+            )
+        }
         composable(NavTarget.ImageSource.label) {
             ImageSourceScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.Edit) },
+                navigateBack = { navController.popBackStack() },
                 viewModel = vm
             )
         }
