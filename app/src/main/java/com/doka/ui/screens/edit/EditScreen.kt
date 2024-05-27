@@ -4,11 +4,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -34,9 +35,11 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -45,6 +48,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
+import com.doka.R
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
@@ -53,7 +57,12 @@ import com.doka.ui.theme.RudeMid
 
 
 @Composable
-fun EditScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
+fun EditScreen(
+    modifier: Modifier = Modifier,
+    navigateNext: () -> Unit = {},
+    navigateBack: () -> Unit = {},
+    viewModel: MainViewModel = hiltViewModel()
+) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
@@ -92,7 +101,10 @@ fun EditScreen(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltVie
                     height = Dimension.percent(0.25f) // Set height to 1/4 of the screen
                 }
         ) {
-            BottomPanel(viewModel = viewModel)
+            BottomPanel(
+                viewModel = viewModel, navigateNext = navigateNext,
+                navigateBack = navigateBack
+            )
         }
     }
 }
@@ -176,9 +188,12 @@ fun FrameWithImage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
 }
 
 @Composable
-fun BottomPanel(modifier: Modifier = Modifier, viewModel: MainViewModel) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+fun BottomPanel(
+    modifier: Modifier = Modifier, navigateNext: () -> Unit = {},
+    navigateBack: () -> Unit = {}, viewModel: MainViewModel
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
@@ -186,10 +201,26 @@ fun BottomPanel(modifier: Modifier = Modifier, viewModel: MainViewModel) {
                 color = RudeMid,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
-            .padding(16.dp)
+            .padding(vertical = 16.dp, horizontal = 30.dp)
 
     ) {
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
+            contentDescription = "Button back",
+            modifier = Modifier
+                .clickable { navigateBack() }
+                .padding(end = 16.dp)
+        )
+
         TouchPanel(viewModel = viewModel)
+
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
+            contentDescription = "Button back",
+            modifier = Modifier
+                .clickable { navigateNext() }
+                .padding(start = 16.dp)
+        )
     }
 }
 

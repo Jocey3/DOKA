@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.doka.ui.screens.edit.EditScreen
+import com.doka.ui.screens.exposure.ExposureScreen
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.screens.splash.SplashScreen
 import kotlinx.coroutines.flow.launchIn
@@ -45,7 +46,17 @@ fun NavigationComponent(
             )
         }
         composable(NavTarget.Edit.label) {
-            EditScreen(viewModel = vm)
+            EditScreen(
+                navigateNext = { navigator.navigateTo(NavTarget.Exposure) },
+                navigateBack = { navController.popBackStack() }, viewModel = vm
+            )
+        }
+        composable(NavTarget.Exposure.label) {
+            ExposureScreen(
+                navigateExpose = { },
+                navigateSettings = { },
+                navigateBack = { navController.popBackStack() }, viewModel = vm
+            )
         }
 
     }

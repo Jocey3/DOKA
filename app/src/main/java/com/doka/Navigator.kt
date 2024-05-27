@@ -17,5 +17,6 @@ class Navigator {
 enum class NavTarget(val label: String) {
     Splash("splash"),
     ImageSource("imageSource"),
-    Edit("edit")
+    Edit("edit"),
+    Exposure("exposure")
 }
