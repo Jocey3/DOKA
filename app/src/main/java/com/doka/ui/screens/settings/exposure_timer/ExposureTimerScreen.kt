@@ -1,14 +1,15 @@
-package com.doka.ui.screens.edit
+package com.doka.ui.screens.settings.exposure_timer
+
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,12 +17,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -34,34 +46,36 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
+import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
-import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
+import com.doka.ui.theme.TextSimpleColor
 
 
 @Composable
-fun EditScreen(
+fun ExposureTimerScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: EditViewModel = hiltViewModel()
-
+    viewModel: ExposureTimerViewModel = hiltViewModel()
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -88,7 +102,7 @@ fun EditScreen(
                 modifier = Modifier
                     .size(width = 330.dp, height = 220.dp)
                     .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
-                sharedVM = sharedVM
+                viewModel = sharedVM
             )
         }
 
@@ -102,7 +116,7 @@ fun EditScreen(
                 }
         ) {
             BottomPanel(
-                sharedVM = sharedVM, navigateNext = navigateNext,
+                viewModel = sharedVM, navigateNext = navigateNext,
                 navigateBack = navigateBack
             )
         }
@@ -111,7 +125,7 @@ fun EditScreen(
 
 
 @Composable
-fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+fun MainFrame(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     BoxWithConstraints(
         modifier = modifier
             .clipToBounds()
@@ -127,26 +141,26 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
         val startX = ((parentWidthPx - imageWidthPx) / 2)
         val startY = ((parentHeightPx - imageHeightPx) / 2)
 
-        sharedVM.boxWidth.floatValue = parentWidthPx.toFloat()
-        sharedVM.boxHeight.floatValue = parentHeightPx.toFloat()
-        sharedVM.imageWidth.floatValue = imageWidthPx
-        sharedVM.imageHeight.floatValue = imageHeightPx
+        viewModel.boxWidth.floatValue = parentWidthPx.toFloat()
+        viewModel.boxHeight.floatValue = parentHeightPx.toFloat()
+        viewModel.imageWidth.floatValue = imageWidthPx
+        viewModel.imageHeight.floatValue = imageHeightPx
 
-        sharedVM.offset.value = Offset(startX, startY)
+        viewModel.offset.value = Offset(startX, startY)
 
 
         FrameWithImage(
             modifier = Modifier
                 .offset {
-                    sharedVM.offset.value.round()
-                }, sharedVM
+                    viewModel.offset.value.round()
+                }, viewModel
 
         )
     }
 }
 
 @Composable
-fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+fun FrameWithImage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
@@ -158,15 +172,15 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
             .clip(RoundedCornerShape(8.dp))
 
     ) {
-        sharedVM.currentBitmap?.let {
+        viewModel.currentBitmap?.let {
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        scaleX = sharedVM.zoom.value
-                        scaleY = sharedVM.zoom.value
-                        rotationZ = sharedVM.angle.value
+                        scaleX = viewModel.zoom.value
+                        scaleY = viewModel.zoom.value
+                        rotationZ = viewModel.angle.value
                     },
                 contentDescription = "Image for edit",
                 contentScale = ContentScale.Crop
@@ -190,10 +204,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
 @Composable
 fun BottomPanel(
     modifier: Modifier = Modifier, navigateNext: () -> Unit = {},
-    navigateBack: () -> Unit = {}, sharedVM: MainViewModel
+    navigateBack: () -> Unit = {}, viewModel: MainViewModel
 ) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(
@@ -201,57 +214,99 @@ fun BottomPanel(
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
+    ) {
+        Row() {
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
+                contentDescription = "Button back",
+                modifier = Modifier
+                    .clickable { navigateBack() }
+                    .padding(end = 16.dp)
+            )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Exposure",
+                color = TextSimpleColor,
+                fontSize = 25.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
 
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
+                contentDescription = "Button Next",
+                modifier = Modifier
+                    .clickable { navigateNext() }
+                    .padding(start = 16.dp)
+            )
+        }
+
+        TimeSlider(modifier = Modifier.weight(1f))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeSlider(modifier: Modifier = Modifier) {
+    var sliderPosition by remember { mutableFloatStateOf(0f) }
+
+    val colors = SliderDefaults.colors(
+        thumbColor = ButtonBackgroundColor,
+        activeTrackColor = TextSimpleColor,
+        inactiveTrackColor = TextSimpleColor,
+    )
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
-            contentDescription = "Button back",
-            modifier = Modifier
-                .clickable { navigateBack() }
-                .padding(end = 16.dp)
+            modifier = Modifier.clickable {
+                sliderPosition -= 1
+            },
+            imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
+            contentDescription = "Minus"
+        )
+        Slider(
+            modifier = Modifier.weight(1f),
+            track = { sliderPositions ->
+                SliderDefaults.Track(
+                    modifier = Modifier
+                        .scale(scaleX = 1f, scaleY = 2f),
+                    sliderPositions = sliderPositions, colors = colors
+                )
+            },
+            thumb = {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(ButtonBackgroundColor, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = String.format("%.0f", sliderPosition),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RudeDark
+                    )
+                }
+            },
+            valueRange = 0f..60f,
+            value = sliderPosition,
+            onValueChange = { sliderPosition = it }
         )
 
-        TouchPanel(modifier = Modifier.weight(1f), sharedVM = sharedVM)
-
         Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
-            contentDescription = "Button Next",
-            modifier = Modifier
-                .clickable { navigateNext() }
-                .padding(start = 16.dp)
+            modifier = Modifier.clickable {
+                sliderPosition += 1
+            },
+            imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
+            contentDescription = "Plus"
         )
     }
 }
 
-@Composable
-fun TouchPanel(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    Box(
-        modifier = modifier
-            .padding(bottom = 16.dp)
-            .fillMaxSize()
-            .background(
-                color = RudeLight,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .pointerInput(Unit) {
-                detectTransformGestures(
-                    onGesture = { gestureCentroid, gesturePan, gestureZoom, gestureRotate ->
-                        val oldScale = sharedVM.zoom.value
-                        val newScale =
-                            (sharedVM.zoom.value * gestureZoom).coerceIn(0.5f..5f)
-                        if (oldScale == newScale) {
-                            val summed = sharedVM.offset.value + gesturePan
-                            sharedVM.updateOffset(summed)
-                        } else {
-                            sharedVM.updateAngle(sharedVM.angle.value + gestureRotate)
-                            sharedVM.updateZoom(newScale)
-                        }
-
-                    }
-                )
-            }
-    )
-}
 
 fun Modifier.dashedBorder(
     color: Color,
@@ -288,6 +343,6 @@ fun Modifier.dashedBorder(
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
-        EditScreen()
+        ExposureTimerScreen()
     }
 }

@@ -22,3 +22,4 @@ val TextSimpleColor = Color(0xFFAE2D2D)
 val TextCancelColor = Color(0xFFDE2626)
 val RectangleBorderColor = Color(0xFF5F1414)
 val FrameInnerColor = Color(0xFF301E1E)
+

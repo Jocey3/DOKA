@@ -1,7 +1,5 @@
 package com.doka.ui.screens.exposure
 
-import android.app.Activity
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,7 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,14 +51,9 @@ fun ExposureScreen(
     navigateExpose: () -> Unit = {},
     navigateSettings: () -> Unit = {},
     navigateBack: () -> Unit = {},
-    viewModel: MainViewModel = hiltViewModel(),
+    sharedVM: MainViewModel = hiltViewModel(),
+    viewModel: ExposureViewModel = hiltViewModel(),
 ) {
-    val activity = LocalContext.current as? Activity
-
-    BackHandler {
-        activity?.finish()
-    }
-
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
@@ -151,8 +142,7 @@ fun BottomPanel(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
             .background(
                 color = RudeMid,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)

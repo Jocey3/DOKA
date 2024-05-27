@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.doka.ui.screens.edit.EditScreen
 import com.doka.ui.screens.exposure.ExposureScreen
+import com.doka.ui.screens.settings.SettingsScreen
+import com.doka.ui.screens.settings.exposure_timer.ExposureTimerScreen
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.screens.splash.SplashScreen
 import kotlinx.coroutines.flow.launchIn
@@ -26,7 +28,7 @@ fun NavigationComponent(
         }.launchIn(this)
     }
 
-    val vm: MainViewModel = hiltViewModel()
+    val sharedVM: MainViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -35,27 +37,39 @@ fun NavigationComponent(
         composable(NavTarget.Splash.label) {
             SplashScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.ImageSource) },
-                viewModel = vm
+                viewModel = sharedVM
             )
         }
         composable(NavTarget.ImageSource.label) {
             ImageSourceScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.Edit) },
                 navigateBack = { navController.popBackStack() },
-                viewModel = vm
+                sharedVM = sharedVM
             )
         }
         composable(NavTarget.Edit.label) {
             EditScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.Exposure) },
-                navigateBack = { navController.popBackStack() }, viewModel = vm
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
             )
         }
         composable(NavTarget.Exposure.label) {
             ExposureScreen(
                 navigateExpose = { },
-                navigateSettings = { },
-                navigateBack = { navController.popBackStack() }, viewModel = vm
+                navigateSettings = { navigator.navigateTo(NavTarget.Settings) },
+                navigateBack = { navController.popBackStack() }, sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.Settings.label) {
+            SettingsScreen(
+                navigateBack = { navController.popBackStack() },
+                navigateExpTimer = { navigator.navigateTo(NavTarget.ExposureTimer) },
+            )
+        }
+        composable(NavTarget.ExposureTimer.label) {
+            ExposureTimerScreen(
+                navigateNext = { navController.popBackStack() }, sharedVM = sharedVM
             )
         }
 

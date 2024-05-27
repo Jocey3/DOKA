@@ -59,7 +59,8 @@ fun ImageSourceScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
-    viewModel: MainViewModel = hiltViewModel(),
+    sharedVM: MainViewModel = hiltViewModel(),
+    viewModel: ImageSourceViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -75,7 +76,7 @@ fun ImageSourceScreen(
                 try {
                     val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
                     if (inputStream != null) {
-                        viewModel.currentBitmap = BitmapFactory.decodeStream(inputStream)
+                        sharedVM.currentBitmap = BitmapFactory.decodeStream(inputStream)
                         navigateNext.invoke()
                     }
                 } catch (e: IOException) {
