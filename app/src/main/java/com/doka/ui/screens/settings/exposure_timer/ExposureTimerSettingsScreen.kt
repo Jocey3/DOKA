@@ -58,7 +58,7 @@ import com.doka.ui.theme.TextSimpleColor
 
 
 @Composable
-fun ExposureTimerScreen(
+fun ExposureTimerSettingsScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
@@ -292,6 +292,6 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
-        ExposureTimerScreen()
+        ExposureTimerSettingsScreen()
     }
 }

@@ -10,9 +10,10 @@ import androidx.navigation.compose.rememberNavController
 import com.doka.ui.screens.edit.EditScreen
 import com.doka.ui.screens.exposure.ExposureScreen
 import com.doka.ui.screens.settings.SettingsScreen
-import com.doka.ui.screens.settings.exposure_timer.ExposureTimerScreen
+import com.doka.ui.screens.settings.exposure_timer.ExposureTimerSettingsScreen
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.screens.splash.SplashScreen
+import com.doka.ui.screens.timer_exposure.TimerExposureScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -56,20 +57,28 @@ fun NavigationComponent(
         }
         composable(NavTarget.Exposure.label) {
             ExposureScreen(
-                navigateExpose = { },
+                navigateExpose = { navigator.navigateTo(NavTarget.TimerExposure) },
                 navigateSettings = { navigator.navigateTo(NavTarget.Settings) },
+                navigateBack = { navController.popBackStack() }, sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.TimerExposure.label) {
+            TimerExposureScreen(
+                navigateNext = {},
                 navigateBack = { navController.popBackStack() }, sharedVM = sharedVM
             )
         }
         composable(NavTarget.Settings.label) {
             SettingsScreen(
-                navigateBack = { navController.popBackStack() },
-                navigateExpTimer = { navigator.navigateTo(NavTarget.ExposureTimer) },
+                navigateExpTimer = { navigator.navigateTo(NavTarget.ExposureTimerSettings) },
+                navigateBack = { navController.popBackStack() }
             )
         }
-        composable(NavTarget.ExposureTimer.label) {
-            ExposureTimerScreen(
-                navigateNext = { navController.popBackStack() }, sharedVM = sharedVM
+        composable(NavTarget.ExposureTimerSettings.label) {
+            ExposureTimerSettingsScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
             )
         }
 
