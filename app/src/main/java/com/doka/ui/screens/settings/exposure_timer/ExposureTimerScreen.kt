@@ -24,10 +24,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +43,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +56,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
+import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
@@ -77,6 +73,8 @@ fun ExposureTimerScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: ExposureTimerViewModel = hiltViewModel()
 ) {
+    viewModel.timer.value = sharedVM.timeForExposure.value
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
@@ -102,7 +100,7 @@ fun ExposureTimerScreen(
                 modifier = Modifier
                     .size(width = 330.dp, height = 220.dp)
                     .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
-                viewModel = sharedVM
+                sharedVM
             )
         }
 
@@ -116,51 +114,32 @@ fun ExposureTimerScreen(
                 }
         ) {
             BottomPanel(
-                viewModel = sharedVM, navigateNext = navigateNext,
+                sharedVM = sharedVM,
+                navigateNext = navigateNext,
                 navigateBack = navigateBack
             )
         }
     }
 }
 
-
 @Composable
-fun MainFrame(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     BoxWithConstraints(
+        contentAlignment = Alignment.Center,
         modifier = modifier
             .clipToBounds()
     ) {
-        val parentWidthPx = constraints.maxWidth
-        val parentHeightPx = constraints.maxHeight
-
-        val imageWidth = 179.dp
-        val imageHeight = 127.dp
-        val imageWidthPx = with(LocalDensity.current) { imageWidth.toPx() }
-        val imageHeightPx = with(LocalDensity.current) { imageHeight.toPx() }
-
-        val startX = ((parentWidthPx - imageWidthPx) / 2)
-        val startY = ((parentHeightPx - imageHeightPx) / 2)
-
-        viewModel.boxWidth.floatValue = parentWidthPx.toFloat()
-        viewModel.boxHeight.floatValue = parentHeightPx.toFloat()
-        viewModel.imageWidth.floatValue = imageWidthPx
-        viewModel.imageHeight.floatValue = imageHeightPx
-
-        viewModel.offset.value = Offset(startX, startY)
-
-
-        FrameWithImage(
-            modifier = Modifier
-                .offset {
-                    viewModel.offset.value.round()
-                }, viewModel
-
-        )
+        FrameWithImage(modifier = Modifier.offset {
+            Offset(
+                sharedVM.savedImagesSettings.value.offsetX,
+                sharedVM.savedImagesSettings.value.offsetY
+            ).round()
+        }, sharedVM = sharedVM)
     }
 }
 
 @Composable
-fun FrameWithImage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
@@ -172,15 +151,15 @@ fun FrameWithImage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             .clip(RoundedCornerShape(8.dp))
 
     ) {
-        viewModel.currentBitmap?.let {
+        sharedVM.currentBitmap?.let {
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        scaleX = viewModel.zoom.value
-                        scaleY = viewModel.zoom.value
-                        rotationZ = viewModel.angle.value
+                        scaleX = sharedVM.savedImagesSettings.value.zoom
+                        scaleY = sharedVM.savedImagesSettings.value.zoom
+                        rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
                 contentScale = ContentScale.Crop
@@ -203,8 +182,11 @@ fun FrameWithImage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
 
 @Composable
 fun BottomPanel(
-    modifier: Modifier = Modifier, navigateNext: () -> Unit = {},
-    navigateBack: () -> Unit = {}, viewModel: MainViewModel
+    modifier: Modifier = Modifier,
+    navigateNext: () -> Unit = {},
+    navigateBack: () -> Unit = {},
+    sharedVM: MainViewModel,
+    viewModel: ExposureTimerViewModel = hiltViewModel()
 ) {
     Column(
         modifier = modifier
@@ -236,7 +218,10 @@ fun BottomPanel(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
                 modifier = Modifier
-                    .clickable { navigateNext() }
+                    .clickable {
+                        sharedVM.timeForExposure.value = viewModel.timer.value
+                        navigateNext()
+                    }
                     .padding(start = 16.dp)
             )
         }
@@ -247,9 +232,7 @@ fun BottomPanel(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeSlider(modifier: Modifier = Modifier) {
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
-
+fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel = hiltViewModel()) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -263,7 +246,7 @@ fun TimeSlider(modifier: Modifier = Modifier) {
     ) {
         Image(
             modifier = Modifier.clickable {
-                sliderPosition -= 1
+                viewModel.timer.value -= 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -285,7 +268,7 @@ fun TimeSlider(modifier: Modifier = Modifier) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", sliderPosition),
+                        text = String.format("%.0f", viewModel.timer.value),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
@@ -293,13 +276,13 @@ fun TimeSlider(modifier: Modifier = Modifier) {
                 }
             },
             valueRange = 0f..60f,
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it }
+            value = viewModel.timer.value,
+            onValueChange = { viewModel.timer.value = it }
         )
 
         Image(
             modifier = Modifier.clickable {
-                sliderPosition += 1
+                viewModel.timer.value += 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"

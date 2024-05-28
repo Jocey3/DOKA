@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.round
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.doka.ImageSettings
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.DOKATheme
@@ -88,7 +89,7 @@ fun EditScreen(
                 modifier = Modifier
                     .size(width = 330.dp, height = 220.dp)
                     .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
-                sharedVM = sharedVM
+                sharedVM = sharedVM, viewModel = viewModel
             )
         }
 
@@ -111,7 +112,7 @@ fun EditScreen(
 
 
 @Composable
-fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel, viewModel: EditViewModel) {
     BoxWithConstraints(
         modifier = modifier
             .clipToBounds()
@@ -127,26 +128,29 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
         val startX = ((parentWidthPx - imageWidthPx) / 2)
         val startY = ((parentHeightPx - imageHeightPx) / 2)
 
-        sharedVM.boxWidth.floatValue = parentWidthPx.toFloat()
-        sharedVM.boxHeight.floatValue = parentHeightPx.toFloat()
-        sharedVM.imageWidth.floatValue = imageWidthPx
-        sharedVM.imageHeight.floatValue = imageHeightPx
+        viewModel.boxWidth.floatValue = parentWidthPx.toFloat()
+        viewModel.boxHeight.floatValue = parentHeightPx.toFloat()
+        viewModel.imageWidth.floatValue = imageWidthPx
+        viewModel.imageHeight.floatValue = imageHeightPx
 
-        sharedVM.offset.value = Offset(startX, startY)
-
+        if (viewModel.offset.value == Offset.Zero) viewModel.updateOffset(Offset(startX, startY))
 
         FrameWithImage(
             modifier = Modifier
                 .offset {
-                    sharedVM.offset.value.round()
-                }, sharedVM
+                    viewModel.offset.value.round()
+                }, sharedVM, viewModel = viewModel
 
         )
     }
 }
 
 @Composable
-fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+fun FrameWithImage(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel,
+    viewModel: EditViewModel
+) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
@@ -164,9 +168,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        scaleX = sharedVM.zoom.value
-                        scaleY = sharedVM.zoom.value
-                        rotationZ = sharedVM.angle.value
+                        scaleX = viewModel.zoom.value
+                        scaleY = viewModel.zoom.value
+                        rotationZ = viewModel.angle.value
                     },
                 contentDescription = "Image for edit",
                 contentScale = ContentScale.Crop
@@ -189,8 +193,11 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
 
 @Composable
 fun BottomPanel(
-    modifier: Modifier = Modifier, navigateNext: () -> Unit = {},
-    navigateBack: () -> Unit = {}, sharedVM: MainViewModel
+    modifier: Modifier = Modifier,
+    navigateNext: () -> Unit = {},
+    navigateBack: () -> Unit = {},
+    sharedVM: MainViewModel,
+    viewModel: EditViewModel = hiltViewModel()
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -217,14 +224,20 @@ fun BottomPanel(
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
             contentDescription = "Button Next",
             modifier = Modifier
-                .clickable { navigateNext() }
+                .clickable {
+                    navigateNext()
+                }
                 .padding(start = 16.dp)
         )
     }
 }
 
 @Composable
-fun TouchPanel(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+fun TouchPanel(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel,
+    viewModel: EditViewModel = hiltViewModel()
+) {
     Box(
         modifier = modifier
             .padding(bottom = 16.dp)
@@ -236,17 +249,22 @@ fun TouchPanel(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
             .pointerInput(Unit) {
                 detectTransformGestures(
                     onGesture = { gestureCentroid, gesturePan, gestureZoom, gestureRotate ->
-                        val oldScale = sharedVM.zoom.value
+                        val oldScale = viewModel.zoom.value
                         val newScale =
-                            (sharedVM.zoom.value * gestureZoom).coerceIn(0.5f..5f)
+                            (viewModel.zoom.value * gestureZoom).coerceIn(0.5f..5f)
                         if (oldScale == newScale) {
-                            val summed = sharedVM.offset.value + gesturePan
-                            sharedVM.updateOffset(summed)
+                            val summed = viewModel.offset.value + gesturePan
+                            viewModel.updateOffset(summed)
                         } else {
-                            sharedVM.updateAngle(sharedVM.angle.value + gestureRotate)
-                            sharedVM.updateZoom(newScale)
+                            viewModel.updateAngle(viewModel.angle.value + gestureRotate)
+                            viewModel.updateZoom(newScale)
                         }
-
+                        sharedVM.savedImagesSettings.value = ImageSettings(
+                            viewModel.zoom.value,
+                            viewModel.angle.value,
+                            viewModel.offset.value.x,
+                            viewModel.offset.value.y
+                        )
                     }
                 )
             }
