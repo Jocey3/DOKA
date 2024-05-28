@@ -28,17 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,7 +40,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
@@ -73,7 +65,7 @@ fun ExposureTimerScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: ExposureTimerViewModel = hiltViewModel()
 ) {
-    viewModel.timer.value = sharedVM.timeForExposure.value
+    viewModel.timer.floatValue = sharedVM.timeForExposure.value
 
     ConstraintLayout(
         modifier = Modifier
@@ -123,18 +115,24 @@ fun ExposureTimerScreen(
 }
 
 @Composable
-fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+fun MainFrame(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel,
+    viewModel: ExposureTimerViewModel = hiltViewModel()
+) {
     BoxWithConstraints(
-        contentAlignment = Alignment.Center,
         modifier = modifier
             .clipToBounds()
     ) {
-        FrameWithImage(modifier = Modifier.offset {
-            Offset(
-                sharedVM.savedImagesSettings.value.offsetX,
-                sharedVM.savedImagesSettings.value.offsetY
-            ).round()
-        }, sharedVM = sharedVM)
+        FrameWithImage(
+            modifier = Modifier
+                .offset {
+                    Offset(
+                        sharedVM.savedImagesSettings.value.offsetX,
+                        sharedVM.savedImagesSettings.value.offsetY
+                    ).round()
+                }, sharedVM = sharedVM
+        )
     }
 }
 
@@ -219,7 +217,7 @@ fun BottomPanel(
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.timeForExposure.value = viewModel.timer.value
+                        sharedVM.timeForExposure.value = viewModel.timer.floatValue
                         navigateNext()
                     }
                     .padding(start = 16.dp)
@@ -246,7 +244,7 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value -= 1
+                viewModel.timer.floatValue -= 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -268,7 +266,7 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.timer.value),
+                        text = String.format("%.0f", viewModel.timer.floatValue),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
@@ -276,50 +274,18 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                 }
             },
             valueRange = 0f..60f,
-            value = viewModel.timer.value,
-            onValueChange = { viewModel.timer.value = it }
+            value = viewModel.timer.floatValue,
+            onValueChange = { viewModel.timer.floatValue = it }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value += 1
+                viewModel.timer.floatValue += 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
         )
     }
-}
-
-
-fun Modifier.dashedBorder(
-    color: Color,
-    shape: Shape,
-    strokeWidth: Dp = 4.dp,
-    dashWidth: Dp = 8.dp,
-    gapWidth: Dp = 13.dp,
-    cap: StrokeCap = StrokeCap.Round
-) = this.drawWithContent {
-    val outline = shape.createOutline(size, layoutDirection, this)
-
-    val path = Path()
-    path.addOutline(outline)
-
-    val stroke = Stroke(
-        cap = cap,
-        width = strokeWidth.toPx(),
-        pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
-            phase = 0f
-        )
-    )
-
-    this.drawContent()
-
-    drawPath(
-        path = path,
-        style = stroke,
-        color = color
-    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)

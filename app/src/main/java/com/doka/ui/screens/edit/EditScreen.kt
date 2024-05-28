@@ -60,9 +60,7 @@ fun EditScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
-    sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: EditViewModel = hiltViewModel()
-
+    sharedVM: MainViewModel = hiltViewModel()
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -89,7 +87,7 @@ fun EditScreen(
                 modifier = Modifier
                     .size(width = 330.dp, height = 220.dp)
                     .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
-                sharedVM = sharedVM, viewModel = viewModel
+                sharedVM = sharedVM
             )
         }
 
@@ -112,7 +110,11 @@ fun EditScreen(
 
 
 @Composable
-fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel, viewModel: EditViewModel) {
+fun MainFrame(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel,
+    viewModel: EditViewModel = hiltViewModel()
+) {
     BoxWithConstraints(
         modifier = modifier
             .clipToBounds()
@@ -133,13 +135,13 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel, viewModel:
         viewModel.imageWidth.floatValue = imageWidthPx
         viewModel.imageHeight.floatValue = imageHeightPx
 
-        if (viewModel.offset.value == Offset.Zero) viewModel.updateOffset(Offset(startX, startY))
+        if (viewModel.offset.value == null) viewModel.updateOffset(Offset(startX, startY))
 
         FrameWithImage(
             modifier = Modifier
                 .offset {
-                    viewModel.offset.value.round()
-                }, sharedVM, viewModel = viewModel
+                    viewModel.offset.value!!.round()
+                }, sharedVM
 
         )
     }
@@ -149,7 +151,7 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel, viewModel:
 fun FrameWithImage(
     modifier: Modifier = Modifier,
     sharedVM: MainViewModel,
-    viewModel: EditViewModel
+    viewModel: EditViewModel = hiltViewModel()
 ) {
     Box(
         modifier = modifier
@@ -225,6 +227,12 @@ fun BottomPanel(
             contentDescription = "Button Next",
             modifier = Modifier
                 .clickable {
+                    sharedVM.savedImagesSettings.value = ImageSettings(
+                        viewModel.zoom.value,
+                        viewModel.angle.value,
+                        viewModel.offset.value!!.x,
+                        viewModel.offset.value!!.y
+                    )
                     navigateNext()
                 }
                 .padding(start = 16.dp)
@@ -253,18 +261,12 @@ fun TouchPanel(
                         val newScale =
                             (viewModel.zoom.value * gestureZoom).coerceIn(0.5f..5f)
                         if (oldScale == newScale) {
-                            val summed = viewModel.offset.value + gesturePan
+                            val summed = viewModel.offset.value!! + gesturePan
                             viewModel.updateOffset(summed)
                         } else {
                             viewModel.updateAngle(viewModel.angle.value + gestureRotate)
                             viewModel.updateZoom(newScale)
                         }
-                        sharedVM.savedImagesSettings.value = ImageSettings(
-                            viewModel.zoom.value,
-                            viewModel.angle.value,
-                            viewModel.offset.value.x,
-                            viewModel.offset.value.y
-                        )
                     }
                 )
             }
