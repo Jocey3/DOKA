@@ -10,7 +10,11 @@ import androidx.navigation.compose.rememberNavController
 import com.doka.ui.screens.edit.EditScreen
 import com.doka.ui.screens.exposure.ExposureScreen
 import com.doka.ui.screens.settings.SettingsScreen
+import com.doka.ui.screens.settings.contrast.ContrastScreen
+import com.doka.ui.screens.settings.exposure_e.ExposureEScreen
 import com.doka.ui.screens.settings.exposure_timer.ExposureTimerScreen
+import com.doka.ui.screens.settings.saturation.SaturationScreen
+import com.doka.ui.screens.settings.tint.TintScreen
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.screens.splash.SplashScreen
 import kotlinx.coroutines.flow.launchIn
@@ -65,13 +69,46 @@ fun NavigationComponent(
             SettingsScreen(
                 navigateBack = { navController.popBackStack() },
                 navigateExpTimer = { navigator.navigateTo(NavTarget.ExposureTimer) },
-            )
+                navigateExposure = { navigator.navigateTo(NavTarget.ExposureE) },
+                navigateSaturation = { navigator.navigateTo(NavTarget.Saturation) },
+                navigateContrast = { navigator.navigateTo(NavTarget.Contrast) },
+                navigateTint = { navigator.navigateTo(NavTarget.Tint) },
+                )
         }
         composable(NavTarget.ExposureTimer.label) {
             ExposureTimerScreen(
-                navigateNext = { navController.popBackStack() }, sharedVM = sharedVM
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
             )
         }
-
+        composable(NavTarget.ExposureE.label) {
+            ExposureEScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.Saturation.label) {
+            SaturationScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.Contrast.label) {
+            ContrastScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.Tint.label) {
+            TintScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
     }
 }

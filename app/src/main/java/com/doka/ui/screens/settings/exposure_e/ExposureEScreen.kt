@@ -1,4 +1,4 @@
-package com.doka.ui.screens.settings.exposure_timer
+package com.doka.ui.screens.settings.exposure_e
 
 
 import androidx.compose.foundation.BorderStroke
@@ -66,14 +66,14 @@ import com.doka.ui.theme.TextSimpleColor
 
 
 @Composable
-fun ExposureTimerScreen(
+fun ExposureEScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: ExposureEViewModel = hiltViewModel()
 ) {
-    viewModel.timer.value = sharedVM.timeForExposure.value
+    viewModel.exposure.value = sharedVM.exposure.value
 
     ConstraintLayout(
         modifier = Modifier
@@ -186,7 +186,7 @@ fun BottomPanel(
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel,
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: ExposureEViewModel = hiltViewModel()
 ) {
     Column(
         modifier = modifier
@@ -207,7 +207,7 @@ fun BottomPanel(
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Exp. timer",
+                text = "Exposure",
                 color = TextSimpleColor,
                 fontSize = 25.sp,
                 textAlign = TextAlign.Center,
@@ -219,20 +219,19 @@ fun BottomPanel(
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.timeForExposure.value = viewModel.timer.value
+                        sharedVM.exposure.value = viewModel.exposure.value
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-
-        TimeSlider(modifier = Modifier.weight(1f))
+        ExposureESlider(modifier = Modifier.weight(1f))
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel = hiltViewModel()) {
+fun ExposureESlider(modifier: Modifier = Modifier, viewModel: ExposureEViewModel = hiltViewModel()) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -246,7 +245,7 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value -= 1
+                viewModel.exposure.value -= 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -268,7 +267,7 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.timer.value),
+                        text = String.format("%.0f", viewModel.exposure.value),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
@@ -276,13 +275,13 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                 }
             },
             valueRange = 0f..60f,
-            value = viewModel.timer.value,
-            onValueChange = { viewModel.timer.value = it }
+            value = viewModel.exposure.value,
+            onValueChange = { viewModel.exposure.value = it }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value += 1
+                viewModel.exposure.value += 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
@@ -326,6 +325,6 @@ fun Modifier.dashedBorder(
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
-        ExposureTimerScreen()
+        ExposureEScreen()
     }
 }

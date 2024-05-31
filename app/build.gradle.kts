@@ -77,5 +77,4 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     kapt("com.google.dagger:hilt-android-compiler:2.45")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
-
 }

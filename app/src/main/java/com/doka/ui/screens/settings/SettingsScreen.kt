@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,6 +41,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit = {},
     navigateExpTimer: () -> Unit = {},
+    navigateExposure: () -> Unit = {},
+    navigateSaturation: () -> Unit = {},
+    navigateContrast: () -> Unit = {},
+    navigateTint: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     ConstraintLayout(
@@ -57,26 +62,34 @@ fun SettingsScreen(
                     height = Dimension.percent(0.25f) // Set height to 1/4 of the screen
                 }
         ) {
-            BottomPanel(navigateExpTimer = navigateExpTimer, navigateBack = navigateBack)
+            BottomPanel(
+                navigateExpTimer = navigateExpTimer,
+                navigateBack = navigateBack,
+                navigateExposure = navigateExposure,
+                navigateSaturation = navigateSaturation,
+                navigateContrast = navigateContrast,
+                navigateTint = navigateTint)
         }
-
     }
-
 }
 
 @Composable
 fun BottomPanel(
     modifier: Modifier = Modifier,
     navigateExpTimer: () -> Unit,
+    navigateExposure: () -> Unit,
+    navigateSaturation: () -> Unit,
+    navigateContrast: () -> Unit,
+    navigateTint: () -> Unit,
     navigateBack: () -> Unit = {}
 ) {
-    val buttonList = listOf(
+    val buttonList = remember {listOf(
         ButtonModel("Exp. timer", R.drawable.svg_timer),
         ButtonModel("Exposure", R.drawable.svg_exposure),
         ButtonModel("Saturation", R.drawable.svg_saturation),
-        ButtonModel("Contrast", R.drawable.svg_contrast)
-    )
-
+        ButtonModel("Contrast", R.drawable.svg_contrast),
+        ButtonModel("Tint", R.drawable.svg_tint)
+    )}
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -105,6 +118,10 @@ fun BottomPanel(
                         .width(70.dp)
                         .clickable {
                             if (buttonList[index].title == "Exp. timer") navigateExpTimer()
+                            if (buttonList[index].title == "Exposure") navigateExposure()
+                            if (buttonList[index].title == "Saturation") navigateSaturation()
+                            if (buttonList[index].title == "Contrast") navigateContrast()
+                            if (buttonList[index].title == "Tint") navigateTint()
                         }
                 ) {
                     Image(

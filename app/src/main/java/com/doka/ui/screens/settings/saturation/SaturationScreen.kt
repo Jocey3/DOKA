@@ -1,6 +1,11 @@
-package com.doka.ui.screens.settings.exposure_timer
+package com.doka.ui.screens.settings.saturation
 
-
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +29,11 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,14 +76,14 @@ import com.doka.ui.theme.TextSimpleColor
 
 
 @Composable
-fun ExposureTimerScreen(
+fun SaturationScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: SaturationViewModel = hiltViewModel()
 ) {
-    viewModel.timer.value = sharedVM.timeForExposure.value
+    viewModel.saturation.floatValue = sharedVM.saturation.floatValue
 
     ConstraintLayout(
         modifier = Modifier
@@ -173,7 +183,6 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                     .fillMaxHeight(),
                 contentDescription = "Image for edit",
                 contentScale = ContentScale.Crop
-
             )
         }
 
@@ -186,8 +195,11 @@ fun BottomPanel(
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel,
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: SaturationViewModel = hiltViewModel()
 ) {
+    var saturationDefault = remember {sharedVM.saturation.floatValue}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -202,43 +214,51 @@ fun BottomPanel(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
                 modifier = Modifier
-                    .clickable { navigateBack() }
+                    .clickable {
+                        sharedVM.currentBitmap = sharedVM.changedBitmap
+                        sharedVM.saturation.floatValue = saturationDefault
+                        navigateBack()
+                    }
                     .padding(end = 16.dp)
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Exp. timer",
+                text = "Saturation",
                 color = TextSimpleColor,
                 fontSize = 25.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
-
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.timeForExposure.value = viewModel.timer.value
+                        sharedVM.changedBitmap = sharedVM.currentBitmap
+                        saturationDefault = viewModel.saturation.floatValue
+                        sharedVM.saturation.floatValue = viewModel.saturation.floatValue
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-
-        TimeSlider(modifier = Modifier.weight(1f))
+        SaturationSlider(modifier = Modifier.weight(1f), sharedVM)
     }
 }
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel = hiltViewModel()) {
+fun SaturationSlider(
+    modifier: Modifier = Modifier, sharedVM: MainViewModel,
+    viewModel: SaturationViewModel = hiltViewModel()
+) {
+
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
         inactiveTrackColor = TextSimpleColor,
     )
-
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -246,7 +266,9 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value -= 1
+                if (viewModel.saturation.floatValue > 0){
+                    viewModel.saturation.floatValue -= 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -268,21 +290,30 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.timer.value),
+                        text = String.format("%.2f", viewModel.saturation.floatValue),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
                     )
                 }
             },
-            valueRange = 0f..60f,
-            value = viewModel.timer.value,
-            onValueChange = { viewModel.timer.value = it }
+            valueRange = 0f..2f,
+            value = viewModel.saturation.floatValue,
+            onValueChange = {
+                viewModel.saturation.floatValue = it
+                val originalBitmap = sharedVM.changedBitmap
+                sharedVM.currentBitmap = originalBitmap?.let {
+                    bitmap -> viewModel.changeBitmapSaturationOptimized(bitmap, it)
+                }
+                sharedVM.saturation.floatValue = viewModel.saturation.floatValue
+            }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value += 1
+                if (viewModel.saturation.floatValue < 2){
+                    viewModel.saturation.floatValue += 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
@@ -291,41 +322,10 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
 }
 
 
-fun Modifier.dashedBorder(
-    color: Color,
-    shape: Shape,
-    strokeWidth: Dp = 4.dp,
-    dashWidth: Dp = 8.dp,
-    gapWidth: Dp = 13.dp,
-    cap: StrokeCap = StrokeCap.Round
-) = this.drawWithContent {
-    val outline = shape.createOutline(size, layoutDirection, this)
-
-    val path = Path()
-    path.addOutline(outline)
-
-    val stroke = Stroke(
-        cap = cap,
-        width = strokeWidth.toPx(),
-        pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
-            phase = 0f
-        )
-    )
-
-    this.drawContent()
-
-    drawPath(
-        path = path,
-        style = stroke,
-        color = color
-    )
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
-        ExposureTimerScreen()
+        SaturationScreen()
     }
 }

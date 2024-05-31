@@ -1,5 +1,4 @@
-package com.doka.ui.screens.settings.exposure_timer
-
+package com.doka.ui.screens.settings.tint
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -64,16 +63,15 @@ import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
 
-
 @Composable
-fun ExposureTimerScreen(
+fun TintScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: TintViewModel = hiltViewModel()
 ) {
-    viewModel.timer.value = sharedVM.timeForExposure.value
+    viewModel.tint.value = sharedVM.tint.value
 
     ConstraintLayout(
         modifier = Modifier
@@ -186,7 +184,7 @@ fun BottomPanel(
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel,
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: TintViewModel = hiltViewModel()
 ) {
     Column(
         modifier = modifier
@@ -197,7 +195,7 @@ fun BottomPanel(
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
     ) {
-        Row() {
+        Row {
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
@@ -207,38 +205,35 @@ fun BottomPanel(
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Exp. timer",
+                text = "Tint",
                 color = TextSimpleColor,
                 fontSize = 25.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
-
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.timeForExposure.value = viewModel.timer.value
+                        sharedVM.tint.value = viewModel.tint.value
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-
-        TimeSlider(modifier = Modifier.weight(1f))
+        TintSlider(modifier = Modifier.weight(1f))
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel = hiltViewModel()) {
+fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltViewModel()) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
         inactiveTrackColor = TextSimpleColor,
     )
-
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -246,7 +241,7 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value -= 1
+                viewModel.tint.value -= 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -268,7 +263,7 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.timer.value),
+                        text = String.format("%.0f", viewModel.tint.value),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
@@ -276,13 +271,13 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                 }
             },
             valueRange = 0f..60f,
-            value = viewModel.timer.value,
-            onValueChange = { viewModel.timer.value = it }
+            value = viewModel.tint.value,
+            onValueChange = { viewModel.tint.value = it }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.value += 1
+                viewModel.tint.value += 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
@@ -326,6 +321,6 @@ fun Modifier.dashedBorder(
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
-        ExposureTimerScreen()
+        TintScreen()
     }
 }
