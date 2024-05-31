@@ -8,7 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.theme.DOKATheme
+import com.doka.util.setAppSettings
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -16,6 +18,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setAppSettings()
+
         enableEdgeToEdge()
         setContent {
             DOKATheme {

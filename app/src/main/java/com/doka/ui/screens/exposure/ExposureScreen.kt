@@ -118,7 +118,6 @@ fun MainFrame(modifier: Modifier = Modifier) {
                 .background(FrameInnerColor)
                 .padding(2.dp)
                 .clip(RoundedCornerShape(8.dp))
-
         ) {
             Text(
                 text = "Place photo paper here",
