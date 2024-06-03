@@ -1,7 +1,10 @@
 package com.doka.ui.screens.settings.saturation
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
@@ -33,6 +36,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +58,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -64,6 +70,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.screens.edit.dashedBorder
@@ -73,6 +80,8 @@ import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -303,7 +312,7 @@ fun SaturationSlider(
                 viewModel.saturation.floatValue = it
                 val originalBitmap = sharedVM.changedBitmap
                 sharedVM.currentBitmap = originalBitmap?.let {
-                    bitmap -> viewModel.changeBitmapSaturationOptimized(bitmap, it)
+                        bitmap -> viewModel.changeBitmapSaturationOptimized(bitmap, it)
                 }
                 sharedVM.saturation.floatValue = viewModel.saturation.floatValue
             }
