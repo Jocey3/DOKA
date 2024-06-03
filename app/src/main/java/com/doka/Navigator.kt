@@ -19,10 +19,14 @@ enum class NavTarget(val label: String) {
     ImageSource("imageSource"),
     Edit("edit"),
     Exposure("exposure"),
+    TimerExposure("timerExposure"),
+    TimerDefault("timerDefault"),
     Settings("settings"),
     ExposureTimer("exposureTimer"),
     ExposureE("exposureE"),
     Saturation("saturation"),
     Contrast("contrast"),
-    Tint("tint")
+    Tint("tint"),
+    ExposureTimerSettings("exposureTimerSettings"),
+    Done("done")
 }

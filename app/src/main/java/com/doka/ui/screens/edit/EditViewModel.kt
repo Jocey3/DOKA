@@ -1,5 +1,6 @@
 package com.doka.ui.screens.edit
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +17,8 @@ class EditViewModel @Inject constructor() : ViewModel() {
     private val _angle = mutableStateOf(0f)
     val angle: State<Float> = _angle
 
-    val _offset = mutableStateOf(Offset.Zero)
-    val offset: State<Offset> = _offset
+    private val _offset: MutableState<Offset?> = mutableStateOf(null)
+    val offset: State<Offset?> = _offset
 
     var boxWidth = mutableFloatStateOf(330f)
     val boxHeight = mutableFloatStateOf(220f)
