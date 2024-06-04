@@ -23,6 +23,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,8 +57,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.screens.edit.dashedBorder
-import com.doka.ui.screens.settings.exposure_e.ExposureEViewModel
-import com.doka.ui.screens.settings.saturation.SaturationViewModel
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
@@ -188,6 +187,11 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: ContrastViewModel = hiltViewModel()
 ) {
+
+    var contrastDefault = remember {sharedVM.contrast.floatValue}
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -202,7 +206,11 @@ fun BottomPanel(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
                 modifier = Modifier
-                    .clickable { navigateBack() }
+                    .clickable {
+                        sharedVM.currentBitmap = sharedVM.changedBitmap
+                        sharedVM.contrast.value = contrastDefault
+                        navigateBack()
+                    }
                     .padding(end = 16.dp)
             )
             Text(
@@ -219,19 +227,22 @@ fun BottomPanel(
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
+                        sharedVM.changedBitmap = sharedVM.currentBitmap
+                        contrastDefault = viewModel.contrast.floatValue
                         sharedVM.contrast.value = viewModel.contrast.value
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-        ContrastSlider(modifier = Modifier.weight(1f))
+        ContrastSlider(modifier = Modifier.weight(1f), sharedVM)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContrastSlider(modifier: Modifier = Modifier, viewModel: ContrastViewModel = hiltViewModel()) {
+fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
+                   viewModel: ContrastViewModel = hiltViewModel()) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -245,7 +256,9 @@ fun ContrastSlider(modifier: Modifier = Modifier, viewModel: ContrastViewModel =
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.contrast.value -= 1
+                if (viewModel.contrast.floatValue > 0){
+                    viewModel.contrast.floatValue -= 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -267,21 +280,30 @@ fun ContrastSlider(modifier: Modifier = Modifier, viewModel: ContrastViewModel =
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.contrast.value),
+                        text = String.format("%.2f", viewModel.contrast.floatValue),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
                     )
                 }
             },
-            valueRange = 0f..60f,
+            valueRange = 0f..2f,
             value = viewModel.contrast.value,
-            onValueChange = { viewModel.contrast.value = it }
+            onValueChange = {
+                viewModel.contrast.value = it
+                val originalBitmap = sharedVM.changedBitmap
+                sharedVM.currentBitmap = originalBitmap?.let {
+                        bitmap -> viewModel.changeContrast(bitmap, it)
+                }
+                sharedVM.contrast.floatValue = viewModel.contrast.floatValue
+            }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.contrast.value += 1
+                if (viewModel.contrast.floatValue < 2){
+                    viewModel.contrast.floatValue += 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"

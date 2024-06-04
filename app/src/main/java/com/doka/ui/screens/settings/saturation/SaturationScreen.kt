@@ -1,14 +1,6 @@
 package com.doka.ui.screens.settings.saturation
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.Paint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,45 +24,29 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionContext
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.screens.edit.dashedBorder
@@ -80,9 +56,6 @@ import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.launch
-
 
 @Composable
 fun SaturationScreen(
@@ -207,6 +180,7 @@ fun BottomPanel(
     viewModel: SaturationViewModel = hiltViewModel()
 ) {
     var saturationDefault = remember {sharedVM.saturation.floatValue}
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
     sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
 
     Column(
@@ -312,7 +286,7 @@ fun SaturationSlider(
                 viewModel.saturation.floatValue = it
                 val originalBitmap = sharedVM.changedBitmap
                 sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> viewModel.changeBitmapSaturationOptimized(bitmap, it)
+                        bitmap -> viewModel.changeBitmapSaturationOld(bitmap, it)
                 }
                 sharedVM.saturation.floatValue = viewModel.saturation.floatValue
             }

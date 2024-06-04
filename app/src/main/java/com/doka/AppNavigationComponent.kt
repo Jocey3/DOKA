@@ -13,7 +13,6 @@ import com.doka.ui.screens.exposure.ExposureScreen
 import com.doka.ui.screens.settings.SettingsScreen
 import com.doka.ui.screens.settings.contrast.ContrastScreen
 import com.doka.ui.screens.settings.exposure_e.ExposureEScreen
-import com.doka.ui.screens.settings.exposure_timer.ExposureTimerScreen
 import com.doka.ui.screens.settings.saturation.SaturationScreen
 import com.doka.ui.screens.settings.tint.TintScreen
 import com.doka.ui.screens.settings.exposure_timer.ExposureTimerSettingsScreen
@@ -105,23 +104,21 @@ fun NavigationComponent(
         composable(NavTarget.Settings.label) {
             SettingsScreen(
                 navigateExpTimer = { navigator.navigateTo(NavTarget.ExposureTimerSettings) },
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateExposure = { navigator.navigateTo(NavTarget.ExposureE) },
+                navigateSaturation = { navigator.navigateTo(NavTarget.Saturation) },
+                navigateContrast = { navigator.navigateTo(NavTarget.Contrast) },
+                navigateTint = { navigator.navigateTo(NavTarget.Tint) },
             )
         }
         composable(NavTarget.ExposureTimerSettings.label) {
             ExposureTimerSettingsScreen(
                 navigateNext = { navController.popBackStack() },
                 navigateBack = { navController.popBackStack() },
-                sharedVM = sharedVM
-                navigateExpTimer = { navigator.navigateTo(NavTarget.ExposureTimer) },
-                navigateExposure = { navigator.navigateTo(NavTarget.ExposureE) },
-                navigateSaturation = { navigator.navigateTo(NavTarget.Saturation) },
-                navigateContrast = { navigator.navigateTo(NavTarget.Contrast) },
-                navigateTint = { navigator.navigateTo(NavTarget.Tint) },
-                )
+                sharedVM = sharedVM)
         }
         composable(NavTarget.ExposureTimer.label) {
-            ExposureTimerScreen(
+            ExposureTimerSettingsScreen(
                 navigateNext = { navController.popBackStack() },
                 navigateBack = { navController.popBackStack() },
                 sharedVM = sharedVM

@@ -24,6 +24,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -188,6 +189,10 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: ExposureEViewModel = hiltViewModel()
 ) {
+    var exposureDefault = remember {sharedVM.exposure.floatValue}
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -202,7 +207,11 @@ fun BottomPanel(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
                 modifier = Modifier
-                    .clickable { navigateBack() }
+                    .clickable {
+                        sharedVM.currentBitmap = sharedVM.changedBitmap
+                        sharedVM.exposure.value = exposureDefault
+                        navigateBack()
+                    }
                     .padding(end = 16.dp)
             )
             Text(
@@ -219,19 +228,22 @@ fun BottomPanel(
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.exposure.value = viewModel.exposure.value
+                        sharedVM.changedBitmap = sharedVM.currentBitmap
+                        exposureDefault = viewModel.exposure.floatValue
+                        sharedVM.exposure.floatValue = viewModel.exposure.floatValue
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-        ExposureESlider(modifier = Modifier.weight(1f))
+        ExposureESlider(modifier = Modifier.weight(1f), sharedVM)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExposureESlider(modifier: Modifier = Modifier, viewModel: ExposureEViewModel = hiltViewModel()) {
+fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
+                    viewModel: ExposureEViewModel = hiltViewModel()) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -245,7 +257,9 @@ fun ExposureESlider(modifier: Modifier = Modifier, viewModel: ExposureEViewModel
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.exposure.value -= 1
+                if (viewModel.exposure.floatValue > 0){
+                    viewModel.exposure.floatValue -= 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -267,21 +281,30 @@ fun ExposureESlider(modifier: Modifier = Modifier, viewModel: ExposureEViewModel
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.exposure.value),
+                        text = String.format("%.2f", viewModel.exposure.floatValue),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
                     )
                 }
             },
-            valueRange = 0f..60f,
+            valueRange = 0f..2f,
             value = viewModel.exposure.value,
-            onValueChange = { viewModel.exposure.value = it }
+            onValueChange = {
+                viewModel.exposure.value = it
+                val originalBitmap = sharedVM.changedBitmap
+                sharedVM.currentBitmap = originalBitmap?.let {
+                        bitmap -> viewModel.changeExposure(bitmap, it)
+                }
+                sharedVM.exposure.floatValue = viewModel.exposure.floatValue
+            }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.exposure.value += 1
+                if (viewModel.exposure.floatValue < 2){
+                    viewModel.exposure.floatValue += 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"

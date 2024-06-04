@@ -76,7 +76,7 @@ fun ImageSourceScreen(
                 try {
                     val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
                     if (inputStream != null) {
-                        sharedVM.saturation.floatValue = 1f
+                        sharedVM.setSettingsDefault()
                         sharedVM.currentBitmap = BitmapFactory.decodeStream(inputStream)
                         navigateNext.invoke()
                     }
