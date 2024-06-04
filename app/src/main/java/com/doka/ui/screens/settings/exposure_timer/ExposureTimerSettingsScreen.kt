@@ -121,7 +121,7 @@ fun MainFrame(
     sharedVM: MainViewModel,
     viewModel: ExposureTimerViewModel = hiltViewModel()
 ) {
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .clipToBounds()
     ) {
@@ -252,11 +252,11 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
         )
         Slider(
             modifier = Modifier.weight(1f),
-            track = { sliderPositions ->
+            track = { sliderState ->
                 SliderDefaults.Track(
                     modifier = Modifier
                         .scale(scaleX = 1f, scaleY = 2f),
-                    sliderPositions = sliderPositions, colors = colors
+                    sliderState = sliderState, colors = colors
                 )
             },
             thumb = {

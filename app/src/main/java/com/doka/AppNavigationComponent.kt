@@ -46,14 +46,14 @@ fun NavigationComponent(
         composable(NavTarget.ImageSource.label) {
             ImageSourceScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.Edit) },
-                navigateBack = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack(NavTarget.Splash.label, false) },
                 sharedVM = sharedVM
             )
         }
         composable(NavTarget.Edit.label) {
             EditScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.Exposure) },
-                navigateBack = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack(NavTarget.Splash.label, false) },
                 sharedVM = sharedVM
             )
         }

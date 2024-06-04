@@ -1,7 +1,6 @@
 package com.doka.ui.screens.timer_exposure
 
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,8 +20,6 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
 
     fun loadProgress() {
         viewModelScope.launch {
-            Log.d("Mdhfsfj", "max ${maxTime.value}")
-
             for (i in maxTime.value downTo 0) {
                 if (paused.value) {
                     return@launch

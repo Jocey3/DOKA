@@ -1,6 +1,5 @@
 package com.doka.ui.screens.done
 
-import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +27,7 @@ import com.doka.R
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
-import com.doka.ui.util.ButtonDefault
+import com.doka.util.ButtonDefault
 
 
 @Composable

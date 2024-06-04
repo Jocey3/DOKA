@@ -1,8 +1,6 @@
 package com.doka.ui.screens.timer_exposure
 
-import android.annotation.SuppressLint
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -76,10 +74,6 @@ fun TimerExposureScreen(
         viewModel.maxTime.value = sharedVM.timeForExposure.value.toInt()
         viewModel.loadProgress()
     }
-    Log.d(
-        "Mdhfsfj",
-        "TimerExposureScreen sharedVM.timeForExposure.value.toInt() ${sharedVM.timeForExposure.value.toInt()}, \n viewModel.maxTime.value () ${viewModel.maxTime.value}"
-    )
     viewModel.mediaPlayer = remember { MediaPlayer.create(context, R.raw.beep_sound) }
     viewModel.navigateNext = remember { navigateNext }
 
@@ -253,7 +247,6 @@ fun BottomPanel(
     }
 }
 
-@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hiltViewModel()) {
     Box(
@@ -281,7 +274,7 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun GreetingPreview() {
+fun TimerExposurePreview() {
     DOKATheme {
         TimerExposureScreen()
     }

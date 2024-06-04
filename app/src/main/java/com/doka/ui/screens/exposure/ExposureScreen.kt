@@ -42,7 +42,7 @@ import com.doka.ui.theme.FrameInnerColor
 import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
-import com.doka.ui.util.ButtonDefault
+import com.doka.util.ButtonDefault
 
 
 @Composable

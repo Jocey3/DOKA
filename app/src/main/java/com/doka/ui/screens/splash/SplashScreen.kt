@@ -24,7 +24,7 @@ import com.doka.MainViewModel
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
-import com.doka.ui.util.ButtonDefault
+import com.doka.util.ButtonDefault
 
 
 @Composable
