@@ -117,7 +117,6 @@ fun SaturationScreen(
 @Composable
 fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     BoxWithConstraints(
-        contentAlignment = Alignment.Center,
         modifier = modifier
             .clipToBounds()
     ) {
