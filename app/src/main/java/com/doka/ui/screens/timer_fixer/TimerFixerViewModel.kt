@@ -1,4 +1,4 @@
-package com.doka.ui.screens.timer_exposure
+package com.doka.ui.screens.timer_fixer
 
 import android.media.MediaPlayer
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TimerExposureViewModel @Inject constructor() : ViewModel() {
+class TimerFixerViewModel @Inject constructor() : ViewModel() {
     val maxTime = mutableStateOf(60)
     val timeLeft = mutableStateOf(maxTime.value)
     val timeSpent = mutableStateOf(0)
@@ -21,7 +21,12 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     var mediaPlayer: MediaPlayer? = null
 
     private var timerJob: Job? = null
-    fun loadProgress() {
+
+    init {
+        loadProgress()
+    }
+
+    private fun loadProgress() {
         timerJob?.cancel() // Cancel the previous timer job if any
         timerJob = viewModelScope.launch {
             for (i in maxTime.value - timeSpent.value downTo 0) {
@@ -57,5 +62,4 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
         mediaPlayer = null
         super.onCleared()
     }
-
 }

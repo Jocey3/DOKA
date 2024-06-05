@@ -1,35 +1,41 @@
-package com.doka.ui.screens.timer_default
+package com.doka.ui.screens.timer_developer
 
 import android.media.MediaPlayer
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TimerDefaultViewModel @Inject constructor() : ViewModel() {
+class TimerDeveloperViewModel @Inject constructor() : ViewModel() {
     val maxTime = mutableStateOf(60)
     val timeLeft = mutableStateOf(maxTime.value)
+    val timeSpent = mutableStateOf(0)
     val progress = mutableStateOf(1f)
     val paused = mutableStateOf(false)
     var navigateNext: () -> Unit = {}
     var mediaPlayer: MediaPlayer? = null
 
+    private var timerJob: Job? = null
+
     init {
         loadProgress()
     }
 
-    fun loadProgress() {
-        viewModelScope.launch {
-            for (i in maxTime.value downTo 0) {
+    private fun loadProgress() {
+        timerJob?.cancel() // Cancel the previous timer job if any
+        timerJob = viewModelScope.launch {
+            for (i in maxTime.value - timeSpent.value downTo 0) {
                 if (paused.value) {
                     return@launch
                 }
                 timeLeft.value = i
                 progress.value = i.toFloat() / maxTime.value
+                timeSpent.value = ++timeSpent.value
                 delay(1000)
             }
             playBeepSound()
@@ -39,7 +45,6 @@ class TimerDefaultViewModel @Inject constructor() : ViewModel() {
 
     fun pauseTimer() {
         paused.value = true
-        maxTime.value = timeLeft.value
     }
 
     fun resumeTimer() {
@@ -52,6 +57,7 @@ class TimerDefaultViewModel @Inject constructor() : ViewModel() {
     }
 
     override fun onCleared() {
+        timerJob?.cancel()
         mediaPlayer?.release()
         mediaPlayer = null
         super.onCleared()

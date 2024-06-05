@@ -11,11 +11,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
     var currentBitmap: Bitmap? = null
     val savedImagesSettings = mutableStateOf(ImageSettings(0f, 0f, 0f, 0f))
     val timeForExposure = mutableStateOf(30f)
-    val defaultScreen = mutableStateOf(0)
 
     fun clearData() {
         currentBitmap = null
-        defaultScreen.value = 0
         savedImagesSettings.value = ImageSettings(0f, 0f, 0f, 0f)
     }
 }

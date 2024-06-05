@@ -1,6 +1,5 @@
 package com.doka.ui.screens.source_picture
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,15 +25,12 @@ class ImageSourceViewModel @Inject constructor(
 
     private fun getPicture() {
         viewModelScope.launch {
-            Log.d("LogsDd", "Start getPicture()")
             when (val picture = getPictureUseCase()) {
                 is Resource.Success -> {
-                    Log.d("LogsDd", "Success getPicture()")
                     state = ImageSourceScreenState(picture = picture.data, isLoading = false)
                 }
 
                 is Resource.Error -> {
-                    Log.d("LogsDd", "Error getPicture()")
                     delay(5000)
                     getPicture()
                 }

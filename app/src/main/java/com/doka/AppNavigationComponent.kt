@@ -14,8 +14,9 @@ import com.doka.ui.screens.settings.SettingsScreen
 import com.doka.ui.screens.settings.exposure_timer.ExposureTimerSettingsScreen
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.screens.splash.SplashScreen
-import com.doka.ui.screens.timer_default.TimerDefaultScreen
+import com.doka.ui.screens.timer_developer.TimerDeveloperScreen
 import com.doka.ui.screens.timer_exposure.TimerExposureScreen
+import com.doka.ui.screens.timer_fixer.TimerFixerScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -68,24 +69,21 @@ fun NavigationComponent(
             NavTarget.TimerExposure.label
         ) {
             TimerExposureScreen(
-                navigateNext = {
-                    sharedVM.defaultScreen.value += 1
-                    navigator.navigateTo(NavTarget.TimerDefault)
-                },
+                navigateNext = { navigator.navigateTo(NavTarget.TimerDeveloper) },
                 navigateBack = { navController.popBackStack(NavTarget.Exposure.label, false) },
                 sharedVM = sharedVM
             )
         }
-        composable(NavTarget.TimerDefault.label) {
-            TimerDefaultScreen(
-                navigateNext = {
-                    if (sharedVM.defaultScreen.value < 2) {
-                        sharedVM.defaultScreen.value += 1
-                        navigator.navigateTo(NavTarget.TimerDefault)
-                    } else {
-                        navigator.navigateTo(NavTarget.Done)
-                    }
-                },
+        composable(NavTarget.TimerDeveloper.label) {
+            TimerDeveloperScreen(
+                navigateNext = { navigator.navigateTo(NavTarget.TimerFixer) },
+                navigateBack = { navController.popBackStack(NavTarget.Exposure.label, false) },
+                sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.TimerFixer.label) {
+            TimerFixerScreen(
+                navigateNext = { navigator.navigateTo(NavTarget.Done) },
                 navigateBack = { navController.popBackStack(NavTarget.Exposure.label, false) },
                 sharedVM = sharedVM
             )
