@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.doka.domain.usecase.GetPictureUseCase
 import com.doka.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,18 +20,23 @@ class ImageSourceViewModel @Inject constructor(
     var state by mutableStateOf(ImageSourceScreenState())
         private set
 
+    private val handlerException = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
+
     init {
         getPicture()
     }
 
     private fun getPicture() {
-        viewModelScope.launch {
+        viewModelScope.launch(handlerException) {
             when (val picture = getPictureUseCase()) {
                 is Resource.Success -> {
                     state = ImageSourceScreenState(picture = picture.data, isLoading = false)
                 }
 
                 is Resource.Error -> {
+                    state = state.copy(message = picture.message)
                     delay(5000)
                     getPicture()
                 }

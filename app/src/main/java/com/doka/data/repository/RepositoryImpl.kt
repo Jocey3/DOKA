@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import com.doka.data.data_source.network.RemoteDataSource
 import com.doka.domain.repository.Repository
 import com.doka.util.Resource
+import com.doka.util.adjustedImage
 import com.doka.util.getBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,7 +18,7 @@ class RepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             val response = remoteDataSource.getPicture()
             if (response.isSuccessful) {
-                val bitmap = response.body()?.getBitmap()
+                val bitmap = response.body()?.getBitmap()?.adjustedImage()
                 if (bitmap != null) {
                     Resource.Success(bitmap)
                 } else {
