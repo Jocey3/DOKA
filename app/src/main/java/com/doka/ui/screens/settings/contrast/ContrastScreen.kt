@@ -1,5 +1,4 @@
-package com.doka.ui.screens.settings.exposure_timer
-
+package com.doka.ui.screens.settings.contrast
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -8,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,10 +28,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,6 +47,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
@@ -56,16 +64,15 @@ import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
 
-
 @Composable
-fun ExposureTimerSettingsScreen(
+fun ContrastScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: ContrastViewModel = hiltViewModel()
 ) {
-    viewModel.timer.floatValue = remember { sharedVM.timeForExposure.value }
+    viewModel.contrast.value = sharedVM.contrast.value
 
     ConstraintLayout(
         modifier = Modifier
@@ -115,24 +122,17 @@ fun ExposureTimerSettingsScreen(
 }
 
 @Composable
-fun MainFrame(
-    modifier: Modifier = Modifier,
-    sharedVM: MainViewModel,
-    viewModel: ExposureTimerViewModel = hiltViewModel()
-) {
-    Box(
+fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+    BoxWithConstraints(
         modifier = modifier
             .clipToBounds()
     ) {
-        FrameWithImage(
-            modifier = Modifier
-                .offset {
-                    Offset(
-                        sharedVM.savedImagesSettings.value.offsetX,
-                        sharedVM.savedImagesSettings.value.offsetY
-                    ).round()
-                }, sharedVM = sharedVM
-        )
+        FrameWithImage(modifier = Modifier.offset {
+            Offset(
+                sharedVM.savedImagesSettings.value.offsetX,
+                sharedVM.savedImagesSettings.value.offsetY
+            ).round()
+        }, sharedVM = sharedVM)
     }
 }
 
@@ -184,8 +184,13 @@ fun BottomPanel(
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel,
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: ContrastViewModel = hiltViewModel()
 ) {
+
+    var contrastDefault = remember {sharedVM.contrast.floatValue}
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -200,12 +205,16 @@ fun BottomPanel(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
                 modifier = Modifier
-                    .clickable { navigateBack() }
+                    .clickable {
+                        sharedVM.currentBitmap = sharedVM.changedBitmap
+                        sharedVM.contrast.value = contrastDefault
+                        navigateBack()
+                    }
                     .padding(end = 16.dp)
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Exp. timer",
+                text = "Contrast",
                 color = TextSimpleColor,
                 fontSize = 25.sp,
                 textAlign = TextAlign.Center,
@@ -217,20 +226,22 @@ fun BottomPanel(
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.timeForExposure.value = viewModel.timer.floatValue
+                        sharedVM.changedBitmap = sharedVM.currentBitmap
+                        contrastDefault = viewModel.contrast.floatValue
+                        sharedVM.contrast.value = viewModel.contrast.value
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-
-        TimeSlider(modifier = Modifier.weight(1f))
+        ContrastSlider(modifier = Modifier.weight(1f), sharedVM)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel = hiltViewModel()) {
+fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
+                   viewModel: ContrastViewModel = hiltViewModel()) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -244,18 +255,20 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.floatValue -= 1
+                if (viewModel.contrast.floatValue > 0){
+                    viewModel.contrast.floatValue -= 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
         )
         Slider(
             modifier = Modifier.weight(1f),
-            track = { sliderState ->
+            track = { sliderPositions ->
                 SliderDefaults.Track(
                     modifier = Modifier
                         .scale(scaleX = 1f, scaleY = 2f),
-                    sliderState = sliderState, colors = colors
+                    sliderPositions = sliderPositions, colors = colors
                 )
             },
             thumb = {
@@ -266,21 +279,30 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.timer.floatValue),
+                        text = String.format("%.2f", viewModel.contrast.floatValue),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
                     )
                 }
             },
-            valueRange = 0f..60f,
-            value = viewModel.timer.floatValue,
-            onValueChange = { viewModel.timer.floatValue = it }
+            valueRange = 0f..2f,
+            value = viewModel.contrast.value,
+            onValueChange = {
+                viewModel.contrast.value = it
+                val originalBitmap = sharedVM.changedBitmap
+                sharedVM.currentBitmap = originalBitmap?.let {
+                        bitmap -> viewModel.changeContrast(bitmap, it)
+                }
+                sharedVM.contrast.floatValue = viewModel.contrast.floatValue
+            }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.floatValue += 1
+                if (viewModel.contrast.floatValue < 2){
+                    viewModel.contrast.floatValue += 0.01f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
@@ -288,10 +310,42 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     }
 }
 
+
+fun Modifier.dashedBorder(
+    color: Color,
+    shape: Shape,
+    strokeWidth: Dp = 4.dp,
+    dashWidth: Dp = 8.dp,
+    gapWidth: Dp = 13.dp,
+    cap: StrokeCap = StrokeCap.Round
+) = this.drawWithContent {
+    val outline = shape.createOutline(size, layoutDirection, this)
+
+    val path = Path()
+    path.addOutline(outline)
+
+    val stroke = Stroke(
+        cap = cap,
+        width = strokeWidth.toPx(),
+        pathEffect = PathEffect.dashPathEffect(
+            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
+            phase = 0f
+        )
+    )
+
+    this.drawContent()
+
+    drawPath(
+        path = path,
+        style = stroke,
+        color = color
+    )
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
-        ExposureTimerSettingsScreen()
+        ContrastScreen()
     }
 }

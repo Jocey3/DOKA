@@ -23,6 +23,11 @@ enum class NavTarget(val label: String) {
     TimerDeveloper("timerDeveloper"),
     TimerFixer("timerFixer"),
     Settings("settings"),
+    ExposureTimer("exposureTimer"),
+    ExposureE("exposureE"),
+    Saturation("saturation"),
+    Contrast("contrast"),
+    Tint("tint"),
     ExposureTimerSettings("exposureTimerSettings"),
     Done("done")
 }

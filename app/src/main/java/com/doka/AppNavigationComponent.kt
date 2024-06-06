@@ -11,6 +11,10 @@ import com.doka.ui.screens.done.DoneScreen
 import com.doka.ui.screens.edit.EditScreen
 import com.doka.ui.screens.exposure.ExposureScreen
 import com.doka.ui.screens.settings.SettingsScreen
+import com.doka.ui.screens.settings.contrast.ContrastScreen
+import com.doka.ui.screens.settings.exposure_e.ExposureEScreen
+import com.doka.ui.screens.settings.saturation.SaturationScreen
+import com.doka.ui.screens.settings.tint.TintScreen
 import com.doka.ui.screens.settings.exposure_timer.ExposureTimerSettingsScreen
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.screens.splash.SplashScreen
@@ -98,16 +102,53 @@ fun NavigationComponent(
         composable(NavTarget.Settings.label) {
             SettingsScreen(
                 navigateExpTimer = { navigator.navigateTo(NavTarget.ExposureTimerSettings) },
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateExposure = { navigator.navigateTo(NavTarget.ExposureE) },
+                navigateSaturation = { navigator.navigateTo(NavTarget.Saturation) },
+                navigateContrast = { navigator.navigateTo(NavTarget.Contrast) },
+                navigateTint = { navigator.navigateTo(NavTarget.Tint) },
             )
         }
         composable(NavTarget.ExposureTimerSettings.label) {
             ExposureTimerSettingsScreen(
                 navigateNext = { navController.popBackStack() },
                 navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM)
+        }
+        composable(NavTarget.ExposureTimer.label) {
+            ExposureTimerSettingsScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
                 sharedVM = sharedVM
             )
         }
-
+        composable(NavTarget.ExposureE.label) {
+            ExposureEScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.Saturation.label) {
+            SaturationScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.Contrast.label) {
+            ContrastScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
+        composable(NavTarget.Tint.label) {
+            TintScreen(
+                navigateNext = { navController.popBackStack() },
+                navigateBack = { navController.popBackStack() },
+                sharedVM = sharedVM
+            )
+        }
     }
 }

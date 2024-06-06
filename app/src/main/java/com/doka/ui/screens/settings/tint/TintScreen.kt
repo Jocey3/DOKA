@@ -1,5 +1,4 @@
-package com.doka.ui.screens.settings.exposure_timer
-
+package com.doka.ui.screens.settings.tint
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -8,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,15 +23,21 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,6 +46,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
@@ -56,16 +63,15 @@ import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
 
-
 @Composable
-fun ExposureTimerSettingsScreen(
+fun TintScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: TintViewModel = hiltViewModel()
 ) {
-    viewModel.timer.floatValue = remember { sharedVM.timeForExposure.value }
+    viewModel.tint.value = sharedVM.tint.value
 
     ConstraintLayout(
         modifier = Modifier
@@ -115,24 +121,17 @@ fun ExposureTimerSettingsScreen(
 }
 
 @Composable
-fun MainFrame(
-    modifier: Modifier = Modifier,
-    sharedVM: MainViewModel,
-    viewModel: ExposureTimerViewModel = hiltViewModel()
-) {
-    Box(
+fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
+    BoxWithConstraints(
         modifier = modifier
             .clipToBounds()
     ) {
-        FrameWithImage(
-            modifier = Modifier
-                .offset {
-                    Offset(
-                        sharedVM.savedImagesSettings.value.offsetX,
-                        sharedVM.savedImagesSettings.value.offsetY
-                    ).round()
-                }, sharedVM = sharedVM
-        )
+        FrameWithImage(modifier = Modifier.offset {
+            Offset(
+                sharedVM.savedImagesSettings.value.offsetX,
+                sharedVM.savedImagesSettings.value.offsetY
+            ).round()
+        }, sharedVM = sharedVM)
     }
 }
 
@@ -184,7 +183,7 @@ fun BottomPanel(
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel,
-    viewModel: ExposureTimerViewModel = hiltViewModel()
+    viewModel: TintViewModel = hiltViewModel()
 ) {
     Column(
         modifier = modifier
@@ -195,7 +194,7 @@ fun BottomPanel(
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
     ) {
-        Row() {
+        Row {
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
@@ -205,38 +204,35 @@ fun BottomPanel(
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Exp. timer",
+                text = "Tint",
                 color = TextSimpleColor,
                 fontSize = 25.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
-
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.timeForExposure.value = viewModel.timer.floatValue
+                        sharedVM.tint.value = viewModel.tint.value
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-
-        TimeSlider(modifier = Modifier.weight(1f))
+        TintSlider(modifier = Modifier.weight(1f))
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel = hiltViewModel()) {
+fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltViewModel()) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
         inactiveTrackColor = TextSimpleColor,
     )
-
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -244,18 +240,18 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.floatValue -= 1
+                viewModel.tint.value -= 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
         )
         Slider(
             modifier = Modifier.weight(1f),
-            track = { sliderState ->
+            track = { sliderPositions ->
                 SliderDefaults.Track(
                     modifier = Modifier
                         .scale(scaleX = 1f, scaleY = 2f),
-                    sliderState = sliderState, colors = colors
+                    sliderPositions = sliderPositions, colors = colors
                 )
             },
             thumb = {
@@ -266,7 +262,7 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.timer.floatValue),
+                        text = String.format("%.0f", viewModel.tint.value),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
@@ -274,13 +270,13 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                 }
             },
             valueRange = 0f..60f,
-            value = viewModel.timer.floatValue,
-            onValueChange = { viewModel.timer.floatValue = it }
+            value = viewModel.tint.value,
+            onValueChange = { viewModel.tint.value = it }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.floatValue += 1
+                viewModel.tint.value += 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
@@ -288,10 +284,42 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     }
 }
 
+
+fun Modifier.dashedBorder(
+    color: Color,
+    shape: Shape,
+    strokeWidth: Dp = 4.dp,
+    dashWidth: Dp = 8.dp,
+    gapWidth: Dp = 13.dp,
+    cap: StrokeCap = StrokeCap.Round
+) = this.drawWithContent {
+    val outline = shape.createOutline(size, layoutDirection, this)
+
+    val path = Path()
+    path.addOutline(outline)
+
+    val stroke = Stroke(
+        cap = cap,
+        width = strokeWidth.toPx(),
+        pathEffect = PathEffect.dashPathEffect(
+            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
+            phase = 0f
+        )
+    )
+
+    this.drawContent()
+
+    drawPath(
+        path = path,
+        style = stroke,
+        color = color
+    )
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
-        ExposureTimerSettingsScreen()
+        TintScreen()
     }
 }
