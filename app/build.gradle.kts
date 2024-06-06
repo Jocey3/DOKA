@@ -70,11 +70,24 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.navigation)
+    implementation(libs.androidx.constraintlayout)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+
+    // Hilt
     implementation(libs.google.dagger)
     implementation(libs.androidx.hilt)
     implementation(libs.androidx.constraintlayout)
     kapt("com.google.dagger:hilt-android-compiler:2.45")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
+    kapt(libs.google.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
+
+    // Retrofit
+    implementation(libs.com.squareup.retrofit)
+    implementation(libs.com.squareup.retrofit.conventer)
+    implementation(libs.com.squareup.okhttp3)
+
 }

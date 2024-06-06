@@ -1,5 +1,6 @@
-package com.doka.ui.screens.timer_default
+package com.doka.ui.screens.timer_developer
 
+import android.annotation.SuppressLint
 import android.media.MediaPlayer
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,15 +42,16 @@ import com.doka.ui.theme.DarkTextColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
+import com.doka.ui.theme.TextSimpleColor
 
 
 @Composable
-fun TimerDefaultScreen(
+fun TimerDeveloperScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel(),
-    viewModel: TimerDefaultViewModel = hiltViewModel()
+    viewModel: TimerDeveloperViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     viewModel.mediaPlayer = remember { MediaPlayer.create(context, R.raw.beep_sound) }
@@ -88,11 +89,9 @@ fun TimerDefaultScreen(
 fun BottomPanel(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
-    navigateBack: () -> Unit = {}
+    navigateBack: () -> Unit = {},
+    viewModel: TimerDeveloperViewModel = hiltViewModel()
 ) {
-    val viewModel: TimerDefaultViewModel = hiltViewModel()
-    val isPaused by viewModel.paused
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -120,14 +119,21 @@ fun BottomPanel(
                 modifier = Modifier
                     .clickable { navigateBack() }
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Developer",
+                color = TextSimpleColor,
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
 
             Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.svg_pause),
+                imageVector = ImageVector.vectorResource(id = if (viewModel.paused.value) R.drawable.svg_play else R.drawable.svg_pause),
                 contentDescription = "Button pause",
                 modifier = Modifier
                     .clickable {
-                        if (isPaused) {
+                        if (viewModel.paused.value) {
                             viewModel.resumeTimer()
                         } else {
                             viewModel.pauseTimer()
@@ -140,15 +146,16 @@ fun BottomPanel(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
-fun Timer(modifier: Modifier = Modifier, viewModel: TimerDefaultViewModel = hiltViewModel()) {
+fun Timer(modifier: Modifier = Modifier, viewModel: TimerDeveloperViewModel = hiltViewModel()) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
     ) {
         LinearProgressIndicator(
-            progress = viewModel.progress.value,
+            progress = { viewModel.progress.value },
             color = RudeLight,
             trackColor = ButtonBackgroundColor,
             modifier = Modifier
@@ -169,6 +176,6 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerDefaultViewModel = hilt
 @Composable
 fun GreetingPreview() {
     DOKATheme {
-        TimerDefaultScreen()
+        TimerDeveloperScreen()
     }
 }

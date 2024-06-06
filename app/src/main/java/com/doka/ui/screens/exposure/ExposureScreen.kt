@@ -42,7 +42,9 @@ import com.doka.ui.theme.FrameInnerColor
 import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
-import com.doka.ui.util.ButtonDefault
+import com.doka.util.ButtonDefault
+import com.doka.util.negative
+import com.doka.util.noir
 
 
 @Composable
@@ -92,7 +94,7 @@ fun ExposureScreen(
             BottomPanel(
                 navigateExpose = navigateExpose,
                 navigateSettings = navigateSettings,
-                navigateBack = navigateBack
+                navigateBack = navigateBack,sharedVM=sharedVM
             )
         }
 
@@ -102,7 +104,7 @@ fun ExposureScreen(
 
 @Composable
 fun MainFrame(modifier: Modifier = Modifier) {
-    BoxWithConstraints(
+    Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .clipToBounds()
@@ -136,7 +138,8 @@ fun BottomPanel(
     modifier: Modifier = Modifier,
     navigateExpose: () -> Unit = {},
     navigateSettings: () -> Unit = {},
-    navigateBack: () -> Unit = {}
+    navigateBack: () -> Unit = {},
+    sharedVM: MainViewModel = hiltViewModel()
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -178,6 +181,7 @@ fun BottomPanel(
         Spacer(modifier = Modifier.weight(1f))
 
         ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Expose") {
+            sharedVM.currentBitmap?.negative()
             navigateExpose()
         }
     }

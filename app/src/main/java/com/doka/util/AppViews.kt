@@ -1,4 +1,4 @@
-package com.doka.ui.util
+package com.doka.util
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults

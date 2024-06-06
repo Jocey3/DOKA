@@ -18,12 +18,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val contrast = mutableFloatStateOf(1f)
     val tint = mutableFloatStateOf(0f)
     val timeForExposure = mutableStateOf(30f)
-    val defaultScreen = mutableStateOf(0)
 
     fun clearData() {
         setSettingsDefault()
         currentBitmap = null
-        defaultScreen.value = 0
         savedImagesSettings.value = ImageSettings(0f, 0f, 0f, 0f)
     }
 

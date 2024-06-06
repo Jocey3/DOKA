@@ -1,5 +1,6 @@
 package com.doka.ui.screens.edit
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -62,6 +63,10 @@ fun EditScreen(
     navigateBack: () -> Unit = {},
     sharedVM: MainViewModel = hiltViewModel()
 ) {
+    BackHandler {
+        navigateBack()
+    }
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
