@@ -119,16 +119,14 @@ fun changeTint(bitmap: Bitmap, tintValue: Float): Bitmap {
     val paint = Paint()
     val tintColor = when {
         tintValue < 0 -> {
-            val adjustedValue = (1 + tintValue) / 2
-            Color.argb(30, 0, (255 * adjustedValue).toInt(), 255)
+            val blue = 255
+            val greenComponent = (255 * (1 - tintValue)).toInt()
+            Color.argb(40, 0, greenComponent, blue)
         }
         tintValue > 0 -> {
-            /*val adjustedValue = tintValue / 2
-            Color.argb(30, 255, (255 * adjustedValue).toInt(), 0)*/
-            val adjustedValue = tintValue
             val redComponent = 255
-            val greenComponent = (255 * (1 - adjustedValue)).toInt()
-            Color.argb(30, redComponent, greenComponent, 0)
+            val greenComponent = (255 * (1 - tintValue)).toInt()
+            Color.argb(40, redComponent, greenComponent, 0)
         }
         else -> {
             Color.argb(0, 0, 0, 0)
@@ -138,6 +136,7 @@ fun changeTint(bitmap: Bitmap, tintValue: Float): Bitmap {
     canvas.drawBitmap(bitmap, 0f, 0f, paint)
     return tintedBitmap
 }
+
 
 fun changeBitmapSaturationOptimized(bitmap: Bitmap, saturation: Float): Bitmap {
     val scale = 0.5f

@@ -183,7 +183,7 @@ fun BottomPanel(
     viewModel: TintViewModel = hiltViewModel()
 ) {
 
-    var tintDefault = remember {sharedVM.exposure.floatValue}
+    var tintDefault = remember {sharedVM.tint.floatValue}
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
     sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
 
@@ -285,21 +285,16 @@ fun TintSlider(modifier: Modifier = Modifier,
             valueRange = -1f..1f,
             value = viewModel.tint.value,
             onValueChange = {
-                if (it == -0.00f || it == 0.00f || ( it in -0.01f..0.01f)){
+                if (it == -0.00f || ( it in -0.01f..0.01f)){
                     viewModel.tint.floatValue = 0f
-                    val originalBitmap = sharedVM.changedBitmap
-                    sharedVM.currentBitmap = originalBitmap?.let {
-                            bitmap -> changeTint(bitmap, 0f)
-                    }
-                    sharedVM.tint.floatValue = viewModel.tint.floatValue
                 } else {
                     viewModel.tint.floatValue = it
-                    val originalBitmap = sharedVM.changedBitmap
-                    sharedVM.currentBitmap = originalBitmap?.let {
-                            bitmap -> changeTint(bitmap, it)
-                    }
-                    sharedVM.tint.floatValue = viewModel.tint.floatValue
                 }
+                val originalBitmap = sharedVM.changedBitmap
+                sharedVM.currentBitmap = originalBitmap?.let {
+                        bitmap -> changeTint(bitmap, it)
+                }
+                sharedVM.tint.floatValue = viewModel.tint.floatValue
             }
         )
 
