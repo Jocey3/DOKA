@@ -312,38 +312,6 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
     }
 }
 
-
-fun Modifier.dashedBorder(
-    color: Color,
-    shape: Shape,
-    strokeWidth: Dp = 4.dp,
-    dashWidth: Dp = 8.dp,
-    gapWidth: Dp = 13.dp,
-    cap: StrokeCap = StrokeCap.Round
-) = this.drawWithContent {
-    val outline = shape.createOutline(size, layoutDirection, this)
-
-    val path = Path()
-    path.addOutline(outline)
-
-    val stroke = Stroke(
-        cap = cap,
-        width = strokeWidth.toPx(),
-        pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
-            phase = 0f
-        )
-    )
-
-    this.drawContent()
-
-    drawPath(
-        path = path,
-        style = stroke,
-        color = color
-    )
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun EditScreenPreview() {

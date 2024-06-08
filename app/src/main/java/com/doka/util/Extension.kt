@@ -113,12 +113,28 @@ fun loadCompressedBitmap(bitmap: Bitmap): Bitmap {
     return scaledBitmap
 }
 
-fun changeTint(bitmap: Bitmap, alpha: Int): Bitmap {
+fun changeTint(bitmap: Bitmap, tintValue: Float): Bitmap {
     val tintedBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
     val canvas = Canvas(tintedBitmap)
     val paint = Paint()
-    val alphaColor = (alpha shl 24) or (Color.RED and 0x00FFFFFF)
-    paint.colorFilter = PorterDuffColorFilter(alphaColor, PorterDuff.Mode.SRC_ATOP)
+    val tintColor = when {
+        tintValue < 0 -> {
+            val adjustedValue = (1 + tintValue) / 2
+            Color.argb(30, 0, (255 * adjustedValue).toInt(), 255)
+        }
+        tintValue > 0 -> {
+            /*val adjustedValue = tintValue / 2
+            Color.argb(30, 255, (255 * adjustedValue).toInt(), 0)*/
+            val adjustedValue = tintValue
+            val redComponent = 255
+            val greenComponent = (255 * (1 - adjustedValue)).toInt()
+            Color.argb(30, redComponent, greenComponent, 0)
+        }
+        else -> {
+            Color.argb(0, 0, 0, 0)
+        }
+    }
+    paint.colorFilter = PorterDuffColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP)
     canvas.drawBitmap(bitmap, 0f, 0f, paint)
     return tintedBitmap
 }
@@ -175,3 +191,16 @@ fun changeContrast(bitmap: Bitmap, contrast: Float): Bitmap {
     canvas.drawBitmap(bitmap, 0f, 0f, paint)
     return adjustedBitmap
 }
+
+fun textTintFormat(value : Float): String {
+    var formatted = if (value == value.toLong().toFloat()) {
+        String.format("%.0f", value)
+    } else {
+        String.format("%.2f", value)
+    }
+    if (formatted == "-0.00" || formatted == "0.00"){
+        formatted = "0"
+    }
+    return formatted
+}
+

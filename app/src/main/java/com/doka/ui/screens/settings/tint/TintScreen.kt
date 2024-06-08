@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -32,13 +31,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,7 +40,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
@@ -57,7 +49,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.screens.edit.dashedBorder
-import com.doka.ui.screens.settings.saturation.SaturationViewModel
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
@@ -66,6 +57,7 @@ import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
 import com.doka.util.changeTint
 import com.doka.util.loadCompressedBitmap
+import com.doka.util.textTintFormat
 
 @Composable
 fun TintScreen(
@@ -75,6 +67,7 @@ fun TintScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: TintViewModel = hiltViewModel()
 ) {
+
     viewModel.tint.value = sharedVM.tint.value
 
     ConstraintLayout(
@@ -190,7 +183,7 @@ fun BottomPanel(
     viewModel: TintViewModel = hiltViewModel()
 ) {
 
-    var tintDefault = remember {sharedVM.tint.floatValue}
+    var tintDefault = remember {sharedVM.exposure.floatValue}
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
     sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
 
@@ -210,7 +203,7 @@ fun BottomPanel(
                 modifier = Modifier
                     .clickable {
                         sharedVM.currentBitmap = sharedVM.changedBitmap
-                        sharedVM.tint.floatValue = tintDefault
+                        sharedVM.tint.value = tintDefault
                         navigateBack()
                     }
                     .padding(end = 16.dp)
@@ -230,7 +223,7 @@ fun BottomPanel(
                     .clickable {
                         sharedVM.changedBitmap = sharedVM.currentBitmap
                         tintDefault = viewModel.tint.floatValue
-                        sharedVM.saturation.floatValue = viewModel.tint.floatValue
+                        sharedVM.tint.floatValue = viewModel.tint.floatValue
                         navigateNext()
                     }
                     .padding(start = 16.dp)
@@ -258,8 +251,8 @@ fun TintSlider(modifier: Modifier = Modifier,
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.tint.floatValue > 0){
-                    viewModel.tint.floatValue -= 1f
+                if (viewModel.tint.floatValue > -1){
+                    viewModel.tint.floatValue -= 0.01f
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
@@ -282,67 +275,44 @@ fun TintSlider(modifier: Modifier = Modifier,
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.tint.value),
+                        text = textTintFormat(viewModel.tint.value),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
                     )
                 }
             },
-            valueRange = 0f..255f,
+            valueRange = -1f..1f,
             value = viewModel.tint.value,
             onValueChange = {
-                viewModel.tint.floatValue = it
-                val originalBitmap = sharedVM.changedBitmap
-                sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> changeTint(bitmap, it.toInt())
+                if (it == -0.00f || it == 0.00f || ( it in -0.01f..0.01f)){
+                    viewModel.tint.floatValue = 0f
+                    val originalBitmap = sharedVM.changedBitmap
+                    sharedVM.currentBitmap = originalBitmap?.let {
+                            bitmap -> changeTint(bitmap, 0f)
+                    }
+                    sharedVM.tint.floatValue = viewModel.tint.floatValue
+                } else {
+                    viewModel.tint.floatValue = it
+                    val originalBitmap = sharedVM.changedBitmap
+                    sharedVM.currentBitmap = originalBitmap?.let {
+                            bitmap -> changeTint(bitmap, it)
+                    }
+                    sharedVM.tint.floatValue = viewModel.tint.floatValue
                 }
-                sharedVM.tint.floatValue = viewModel.tint.floatValue
             }
         )
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.tint.floatValue < 255){
-                    viewModel.tint.floatValue += 1f
+                if (viewModel.tint.floatValue < 1){
+                    viewModel.tint.floatValue += 0.01f
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
         )
     }
-}
-
-
-fun Modifier.dashedBorder(
-    color: Color,
-    shape: Shape,
-    strokeWidth: Dp = 4.dp,
-    dashWidth: Dp = 8.dp,
-    gapWidth: Dp = 13.dp,
-    cap: StrokeCap = StrokeCap.Round
-) = this.drawWithContent {
-    val outline = shape.createOutline(size, layoutDirection, this)
-
-    val path = Path()
-    path.addOutline(outline)
-
-    val stroke = Stroke(
-        cap = cap,
-        width = strokeWidth.toPx(),
-        pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
-            phase = 0f
-        )
-    )
-
-    this.drawContent()
-
-    drawPath(
-        path = path,
-        style = stroke,
-        color = color
-    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
