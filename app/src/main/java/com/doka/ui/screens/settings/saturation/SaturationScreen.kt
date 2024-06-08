@@ -116,7 +116,7 @@ fun SaturationScreen(
 
 @Composable
 fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .clipToBounds()
     ) {
@@ -257,11 +257,11 @@ fun SaturationSlider(
         )
         Slider(
             modifier = Modifier.weight(1f),
-            track = { sliderPositions ->
+            track = { sliderState ->
                 SliderDefaults.Track(
                     modifier = Modifier
                         .scale(scaleX = 1f, scaleY = 2f),
-                    sliderPositions = sliderPositions, colors = colors
+                    sliderState = sliderState, colors = colors
                 )
             },
             thumb = {

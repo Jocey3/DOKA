@@ -94,7 +94,7 @@ fun ExposureScreen(
             BottomPanel(
                 navigateExpose = navigateExpose,
                 navigateSettings = navigateSettings,
-                navigateBack = navigateBack,sharedVM=sharedVM
+                navigateBack = navigateBack, sharedVM = sharedVM
             )
         }
 
@@ -181,7 +181,7 @@ fun BottomPanel(
         Spacer(modifier = Modifier.weight(1f))
 
         ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Expose") {
-            sharedVM.currentBitmap?.negative()
+            sharedVM.currentBitmap = sharedVM.currentBitmap?.negative()
             navigateExpose()
         }
     }
