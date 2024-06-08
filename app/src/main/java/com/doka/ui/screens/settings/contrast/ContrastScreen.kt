@@ -63,6 +63,8 @@ import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import com.doka.util.changeContrast
+import com.doka.util.loadCompressedBitmap
 
 @Composable
 fun ContrastScreen(
@@ -123,7 +125,7 @@ fun ContrastScreen(
 
 @Composable
 fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .clipToBounds()
     ) {
@@ -188,7 +190,7 @@ fun BottomPanel(
 ) {
 
     var contrastDefault = remember {sharedVM.contrast.floatValue}
-    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
     sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
 
     Column(
@@ -264,11 +266,11 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
         )
         Slider(
             modifier = Modifier.weight(1f),
-            track = { sliderPositions ->
+            track = { sliderState ->
                 SliderDefaults.Track(
                     modifier = Modifier
                         .scale(scaleX = 1f, scaleY = 2f),
-                    sliderPositions = sliderPositions, colors = colors
+                    sliderState = sliderState, colors = colors
                 )
             },
             thumb = {
@@ -292,7 +294,7 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
                 viewModel.contrast.value = it
                 val originalBitmap = sharedVM.changedBitmap
                 sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> viewModel.changeContrast(bitmap, it)
+                        bitmap -> changeContrast(bitmap, it)
                 }
                 sharedVM.contrast.floatValue = viewModel.contrast.floatValue
             }

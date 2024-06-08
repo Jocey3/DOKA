@@ -23,6 +23,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,12 +57,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.screens.edit.dashedBorder
+import com.doka.ui.screens.settings.saturation.SaturationViewModel
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import com.doka.util.changeTint
+import com.doka.util.loadCompressedBitmap
 
 @Composable
 fun TintScreen(
@@ -122,7 +126,7 @@ fun TintScreen(
 
 @Composable
 fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .clipToBounds()
     ) {
@@ -185,6 +189,11 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: TintViewModel = hiltViewModel()
 ) {
+
+    var tintDefault = remember {sharedVM.tint.floatValue}
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -199,7 +208,11 @@ fun BottomPanel(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
                 modifier = Modifier
-                    .clickable { navigateBack() }
+                    .clickable {
+                        sharedVM.currentBitmap = sharedVM.changedBitmap
+                        sharedVM.tint.floatValue = tintDefault
+                        navigateBack()
+                    }
                     .padding(end = 16.dp)
             )
             Text(
@@ -215,19 +228,24 @@ fun BottomPanel(
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.tint.value = viewModel.tint.value
+                        sharedVM.changedBitmap = sharedVM.currentBitmap
+                        tintDefault = viewModel.tint.floatValue
+                        sharedVM.saturation.floatValue = viewModel.tint.floatValue
                         navigateNext()
                     }
                     .padding(start = 16.dp)
             )
         }
-        TintSlider(modifier = Modifier.weight(1f))
+        TintSlider(modifier = Modifier.weight(1f), sharedVM)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltViewModel()) {
+fun TintSlider(modifier: Modifier = Modifier,
+               sharedVM: MainViewModel,
+               viewModel: TintViewModel = hiltViewModel()
+) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -240,18 +258,20 @@ fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltVie
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.tint.value -= 1
+                if (viewModel.tint.floatValue > 0){
+                    viewModel.tint.floatValue -= 1f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
         )
         Slider(
             modifier = Modifier.weight(1f),
-            track = { sliderPositions ->
+            track = { sliderState ->
                 SliderDefaults.Track(
                     modifier = Modifier
                         .scale(scaleX = 1f, scaleY = 2f),
-                    sliderPositions = sliderPositions, colors = colors
+                    sliderState = sliderState, colors = colors
                 )
             },
             thumb = {
@@ -269,14 +289,23 @@ fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltVie
                     )
                 }
             },
-            valueRange = 0f..60f,
+            valueRange = 0f..255f,
             value = viewModel.tint.value,
-            onValueChange = { viewModel.tint.value = it }
+            onValueChange = {
+                viewModel.tint.floatValue = it
+                val originalBitmap = sharedVM.changedBitmap
+                sharedVM.currentBitmap = originalBitmap?.let {
+                        bitmap -> changeTint(bitmap, it.toInt())
+                }
+                sharedVM.tint.floatValue = viewModel.tint.floatValue
+            }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.tint.value += 1
+                if (viewModel.tint.floatValue < 255){
+                    viewModel.tint.floatValue += 1f
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"

@@ -64,6 +64,8 @@ import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import com.doka.util.changeExposure
+import com.doka.util.loadCompressedBitmap
 
 
 @Composable
@@ -125,7 +127,7 @@ fun ExposureEScreen(
 
 @Composable
 fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    BoxWithConstraints(
+    Box(
         modifier = modifier
             .clipToBounds()
     ) {
@@ -189,7 +191,7 @@ fun BottomPanel(
     viewModel: ExposureEViewModel = hiltViewModel()
 ) {
     var exposureDefault = remember {sharedVM.exposure.floatValue}
-    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
     sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
 
     Column(
@@ -265,11 +267,11 @@ fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
         )
         Slider(
             modifier = Modifier.weight(1f),
-            track = { sliderPositions ->
+            track = { sliderState ->
                 SliderDefaults.Track(
                     modifier = Modifier
                         .scale(scaleX = 1f, scaleY = 2f),
-                    sliderPositions = sliderPositions, colors = colors
+                    sliderState = sliderState, colors = colors
                 )
             },
             thumb = {
@@ -293,7 +295,7 @@ fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
                 viewModel.exposure.value = it
                 val originalBitmap = sharedVM.changedBitmap
                 sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> viewModel.changeExposure(bitmap, it)
+                        bitmap -> changeExposure(bitmap, it)
                 }
                 sharedVM.exposure.floatValue = viewModel.exposure.floatValue
             }
