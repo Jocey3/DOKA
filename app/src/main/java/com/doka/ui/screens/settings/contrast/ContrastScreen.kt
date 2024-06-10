@@ -57,12 +57,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.screens.edit.dashedBorder
+import com.doka.ui.screens.settings.saturation.SaturationViewModel
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import com.doka.util.changeBitmapSaturationOld
 import com.doka.util.changeContrast
 import com.doka.util.loadCompressedBitmap
 
@@ -74,7 +76,7 @@ fun ContrastScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: ContrastViewModel = hiltViewModel()
 ) {
-    viewModel.contrast.value = sharedVM.contrast.value
+    viewModel.contrast.floatValue = sharedVM.contrast.floatValue
 
     ConstraintLayout(
         modifier = Modifier
@@ -209,7 +211,7 @@ fun BottomPanel(
                 modifier = Modifier
                     .clickable {
                         sharedVM.currentBitmap = sharedVM.changedBitmap
-                        sharedVM.contrast.value = contrastDefault
+                        sharedVM.contrast.floatValue = contrastDefault
                         navigateBack()
                     }
                     .padding(end = 16.dp)
@@ -230,7 +232,7 @@ fun BottomPanel(
                     .clickable {
                         sharedVM.changedBitmap = sharedVM.currentBitmap
                         contrastDefault = viewModel.contrast.floatValue
-                        sharedVM.contrast.value = viewModel.contrast.value
+                        sharedVM.contrast.floatValue = viewModel.contrast.floatValue
                         navigateNext()
                     }
                     .padding(start = 16.dp)
@@ -259,6 +261,7 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
             modifier = Modifier.clickable {
                 if (viewModel.contrast.floatValue > 0){
                     viewModel.contrast.floatValue -= 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
@@ -289,14 +292,10 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
                 }
             },
             valueRange = 0f..2f,
-            value = viewModel.contrast.value,
+            value = viewModel.contrast.floatValue,
             onValueChange = {
-                viewModel.contrast.value = it
-                val originalBitmap = sharedVM.changedBitmap
-                sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> changeContrast(bitmap, it)
-                }
-                sharedVM.contrast.floatValue = viewModel.contrast.floatValue
+                viewModel.contrast.floatValue = it
+                changeBitmap(viewModel, sharedVM)
             }
         )
 
@@ -304,6 +303,7 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
             modifier = Modifier.clickable {
                 if (viewModel.contrast.floatValue < 2){
                     viewModel.contrast.floatValue += 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
@@ -318,4 +318,12 @@ fun EditScreenPreview() {
     DOKATheme {
         ContrastScreen()
     }
+}
+
+fun changeBitmap(viewModel: ContrastViewModel, sharedVM: MainViewModel){
+    val originalBitmap = sharedVM.changedBitmap
+    sharedVM.currentBitmap = originalBitmap?.let {
+            bitmap -> changeContrast(bitmap, viewModel.contrast.floatValue)
+    }
+    sharedVM.contrast.floatValue = viewModel.contrast.floatValue
 }

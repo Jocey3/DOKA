@@ -116,7 +116,7 @@ fun BottomPanel(
                     val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
                     if (inputStream != null) {
                         sharedVM.currentBitmap =
-                            BitmapFactory.decodeStream(inputStream).adjustedImage()
+                            BitmapFactory.decodeStream(inputStream)
                         navigateNext.invoke()
                     }
                 } catch (e: IOException) {

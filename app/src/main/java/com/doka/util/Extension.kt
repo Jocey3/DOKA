@@ -1,5 +1,6 @@
 package com.doka.util
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context.AUDIO_SERVICE
 import android.graphics.Bitmap
@@ -191,6 +192,7 @@ fun changeContrast(bitmap: Bitmap, contrast: Float): Bitmap {
     return adjustedBitmap
 }
 
+@SuppressLint("DefaultLocale")
 fun textTintFormat(value : Float): String {
     var formatted = if (value == value.toLong().toFloat()) {
         String.format("%.0f", value)

@@ -8,7 +8,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -253,6 +252,7 @@ fun SaturationSlider(
             modifier = Modifier.clickable {
                 if (viewModel.saturation.floatValue > 0){
                     viewModel.saturation.floatValue -= 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
@@ -286,11 +286,7 @@ fun SaturationSlider(
             value = viewModel.saturation.floatValue,
             onValueChange = {
                 viewModel.saturation.floatValue = it
-                val originalBitmap = sharedVM.changedBitmap
-                sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> changeBitmapSaturationOld(bitmap, it)
-                }
-                sharedVM.saturation.floatValue = viewModel.saturation.floatValue
+                changeBitmap(viewModel, sharedVM)
             }
         )
 
@@ -298,6 +294,7 @@ fun SaturationSlider(
             modifier = Modifier.clickable {
                 if (viewModel.saturation.floatValue < 2){
                     viewModel.saturation.floatValue += 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
@@ -313,4 +310,12 @@ fun EditScreenPreview() {
     DOKATheme {
         SaturationScreen()
     }
+}
+
+fun changeBitmap(viewModel: SaturationViewModel, sharedVM: MainViewModel){
+    val originalBitmap = sharedVM.changedBitmap
+    sharedVM.currentBitmap = originalBitmap?.let {
+            bitmap -> changeBitmapSaturationOld(bitmap, viewModel.saturation.floatValue)
+    }
+    sharedVM.saturation.floatValue = viewModel.saturation.floatValue
 }
