@@ -80,8 +80,8 @@ dependencies {
     implementation(libs.google.dagger)
     implementation(libs.androidx.hilt)
     implementation(libs.androidx.constraintlayout)
-    kapt("com.google.dagger:hilt-android-compiler:2.45")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
+    kapt(libs.google.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
     kapt(libs.google.hilt.compiler)
     kapt(libs.androidx.hilt.compiler)
 
