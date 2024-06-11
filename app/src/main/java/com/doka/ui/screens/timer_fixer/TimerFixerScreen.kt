@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,7 @@ import com.doka.R
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.DarkTextColor
+import com.doka.ui.theme.RedClick
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
@@ -142,7 +144,9 @@ fun BottomPanel(
 
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
         Timer()
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -157,7 +161,7 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerFixerViewModel = hiltVi
         LinearProgressIndicator(
             progress = { viewModel.progress.value },
             color = RudeLight,
-            trackColor = ButtonBackgroundColor,
+            trackColor = if (viewModel.timeLeft.value <= 0) RedClick else ButtonBackgroundColor,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)

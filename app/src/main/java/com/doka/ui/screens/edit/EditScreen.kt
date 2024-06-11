@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -222,11 +224,11 @@ fun BottomPanel(
             contentDescription = "Button back",
             modifier = Modifier
                 .clickable { navigateBack() }
-                .padding(end = 16.dp)
+
         )
-
+        Spacer(modifier = Modifier.width(16.dp))
         TouchPanel(modifier = Modifier.weight(1f), sharedVM = sharedVM)
-
+        Spacer(modifier = Modifier.width(16.dp))
         Image(
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
             contentDescription = "Button Next",
@@ -240,7 +242,6 @@ fun BottomPanel(
                     )
                     navigateNext()
                 }
-                .padding(start = 16.dp)
         )
     }
 }

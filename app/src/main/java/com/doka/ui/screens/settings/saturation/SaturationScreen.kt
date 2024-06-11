@@ -8,15 +8,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -178,9 +179,9 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: SaturationViewModel = hiltViewModel()
 ) {
-    var saturationDefault = remember {sharedVM.saturation.floatValue}
+    var saturationDefault = remember { sharedVM.saturation.floatValue }
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
         modifier = modifier
@@ -201,8 +202,8 @@ fun BottomPanel(
                         sharedVM.saturation.floatValue = saturationDefault
                         navigateBack()
                     }
-                    .padding(end = 16.dp)
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 modifier = Modifier.weight(1f),
                 text = "Saturation",
@@ -211,6 +212,7 @@ fun BottomPanel(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
@@ -221,7 +223,6 @@ fun BottomPanel(
                         sharedVM.saturation.floatValue = viewModel.saturation.floatValue
                         navigateNext()
                     }
-                    .padding(start = 16.dp)
             )
         }
         SaturationSlider(modifier = Modifier.weight(1f), sharedVM)
@@ -248,7 +249,7 @@ fun SaturationSlider(
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue > 0){
+                if (viewModel.saturation.floatValue > 0) {
                     viewModel.saturation.floatValue -= 0.01f
                 }
             },
@@ -284,8 +285,8 @@ fun SaturationSlider(
             onValueChange = {
                 viewModel.saturation.floatValue = it
                 val originalBitmap = sharedVM.changedBitmap
-                sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> viewModel.changeBitmapSaturationOld(bitmap, it)
+                sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+                    viewModel.changeBitmapSaturationOld(bitmap, it)
                 }
                 sharedVM.saturation.floatValue = viewModel.saturation.floatValue
             }
@@ -293,7 +294,7 @@ fun SaturationSlider(
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue < 2){
+                if (viewModel.saturation.floatValue < 2) {
                     viewModel.saturation.floatValue += 0.01f
                 }
             },

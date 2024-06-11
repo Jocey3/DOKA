@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -44,7 +43,6 @@ import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.util.ButtonDefault
 import com.doka.util.negative
-import com.doka.util.noir
 
 
 @Composable
@@ -179,11 +177,14 @@ fun BottomPanel(
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-
-        ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Expose") {
+        ButtonDefault(
+            modifier = Modifier
+                .fillMaxWidth(), text = "Expose"
+        ) {
             sharedVM.currentBitmap = sharedVM.currentBitmap?.negative()
             navigateExpose()
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 

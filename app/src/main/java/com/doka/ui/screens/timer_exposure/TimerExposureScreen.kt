@@ -57,6 +57,7 @@ import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.DarkTextColor
 import com.doka.ui.theme.RectangleBorderColor
+import com.doka.ui.theme.RedClick
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
@@ -252,7 +253,9 @@ fun BottomPanel(
 
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
         Timer()
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -267,7 +270,7 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
         LinearProgressIndicator(
             progress = { viewModel.progress.value },
             color = RudeLight,
-            trackColor = ButtonBackgroundColor,
+            trackColor = if (viewModel.timeLeft.value <= 0) RedClick else ButtonBackgroundColor,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)

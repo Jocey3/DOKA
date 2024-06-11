@@ -79,6 +79,7 @@ fun BottomPanel(modifier: Modifier = Modifier, navigateNext: () -> Unit = {}) {
         ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Load image") {
             navigateNext()
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 

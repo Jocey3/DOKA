@@ -8,15 +8,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -188,9 +189,9 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: ExposureEViewModel = hiltViewModel()
 ) {
-    var exposureDefault = remember {sharedVM.exposure.floatValue}
+    var exposureDefault = remember { sharedVM.exposure.floatValue }
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
         modifier = modifier
@@ -211,8 +212,8 @@ fun BottomPanel(
                         sharedVM.exposure.value = exposureDefault
                         navigateBack()
                     }
-                    .padding(end = 16.dp)
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 modifier = Modifier.weight(1f),
                 text = "Exposure",
@@ -221,7 +222,7 @@ fun BottomPanel(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
-
+            Spacer(modifier = Modifier.width(16.dp))
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
@@ -232,7 +233,6 @@ fun BottomPanel(
                         sharedVM.exposure.floatValue = viewModel.exposure.floatValue
                         navigateNext()
                     }
-                    .padding(start = 16.dp)
             )
         }
         ExposureESlider(modifier = Modifier.weight(1f), sharedVM)
@@ -241,8 +241,10 @@ fun BottomPanel(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
-                    viewModel: ExposureEViewModel = hiltViewModel()) {
+fun ExposureESlider(
+    modifier: Modifier = Modifier, sharedVM: MainViewModel,
+    viewModel: ExposureEViewModel = hiltViewModel()
+) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -256,7 +258,7 @@ fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.exposure.floatValue > 0){
+                if (viewModel.exposure.floatValue > 0) {
                     viewModel.exposure.floatValue -= 0.01f
                 }
             },
@@ -292,8 +294,8 @@ fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
             onValueChange = {
                 viewModel.exposure.value = it
                 val originalBitmap = sharedVM.changedBitmap
-                sharedVM.currentBitmap = originalBitmap?.let {
-                        bitmap -> viewModel.changeExposure(bitmap, it)
+                sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+                    viewModel.changeExposure(bitmap, it)
                 }
                 sharedVM.exposure.floatValue = viewModel.exposure.floatValue
             }
@@ -301,7 +303,7 @@ fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.exposure.floatValue < 2){
+                if (viewModel.exposure.floatValue < 2) {
                     viewModel.exposure.floatValue += 0.01f
                 }
             },

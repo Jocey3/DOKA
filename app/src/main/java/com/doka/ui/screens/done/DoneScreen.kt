@@ -113,6 +113,7 @@ fun BottomPanel(
             sharedVM.clearData()
             navigateNext()
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
