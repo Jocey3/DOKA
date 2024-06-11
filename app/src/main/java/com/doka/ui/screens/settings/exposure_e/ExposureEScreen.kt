@@ -181,9 +181,9 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: ExposureEViewModel = hiltViewModel()
 ) {
-    var exposureDefault = remember {sharedVM.exposure.floatValue}
+    var exposureDefault = remember { sharedVM.exposure.floatValue }
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
         modifier = modifier
@@ -234,8 +234,10 @@ fun BottomPanel(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
-                    viewModel: ExposureEViewModel = hiltViewModel()) {
+fun ExposureESlider(
+    modifier: Modifier = Modifier, sharedVM: MainViewModel,
+    viewModel: ExposureEViewModel = hiltViewModel()
+) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -249,7 +251,7 @@ fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.exposure.floatValue > 0){
+                if (viewModel.exposure.floatValue > 0) {
                     viewModel.exposure.floatValue -= 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -291,7 +293,7 @@ fun ExposureESlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.exposure.floatValue < 2){
+                if (viewModel.exposure.floatValue < 2) {
                     viewModel.exposure.floatValue += 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -310,10 +312,10 @@ fun EditScreenPreview() {
     }
 }
 
-fun changeBitmap(viewModel: ExposureEViewModel, sharedVM: MainViewModel){
+fun changeBitmap(viewModel: ExposureEViewModel, sharedVM: MainViewModel) {
     val originalBitmap = sharedVM.changedBitmap
-    sharedVM.currentBitmap = originalBitmap?.let {
-            bitmap -> changeExposure(bitmap, viewModel.exposure.floatValue)
+    sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+        changeExposure(bitmap, viewModel.exposure.floatValue)
     }
     sharedVM.exposure.floatValue = viewModel.exposure.floatValue
 }
