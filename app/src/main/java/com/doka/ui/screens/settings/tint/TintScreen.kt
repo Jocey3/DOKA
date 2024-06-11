@@ -24,21 +24,15 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,7 +41,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
@@ -63,6 +56,9 @@ import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import com.doka.util.changeTint
+import com.doka.util.loadCompressedBitmap
+import com.doka.util.textTintFormat
 
 @Composable
 fun TintScreen(
@@ -72,7 +68,8 @@ fun TintScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: TintViewModel = hiltViewModel()
 ) {
-    viewModel.tint.value = sharedVM.tint.value
+
+    viewModel.tint.floatValue = sharedVM.tint.floatValue
 
     ConstraintLayout(
         modifier = Modifier
@@ -186,6 +183,11 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: TintViewModel = hiltViewModel()
 ) {
+
+    var tintDefault = remember {sharedVM.tint.floatValue}
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -200,7 +202,11 @@ fun BottomPanel(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
                 contentDescription = "Button back",
                 modifier = Modifier
-                    .clickable { navigateBack() }
+                    .clickable {
+                        sharedVM.currentBitmap = sharedVM.changedBitmap
+                        sharedVM.tint.floatValue = tintDefault
+                        navigateBack()
+                    }
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
@@ -217,18 +223,23 @@ fun BottomPanel(
                 contentDescription = "Button Next",
                 modifier = Modifier
                     .clickable {
-                        sharedVM.tint.value = viewModel.tint.value
+                        sharedVM.changedBitmap = sharedVM.currentBitmap
+                        tintDefault = viewModel.tint.floatValue
+                        sharedVM.tint.floatValue = viewModel.tint.floatValue
                         navigateNext()
                     }
             )
         }
-        TintSlider(modifier = Modifier.weight(1f))
+        TintSlider(modifier = Modifier.weight(1f), sharedVM)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltViewModel()) {
+fun TintSlider(modifier: Modifier = Modifier,
+               sharedVM: MainViewModel,
+               viewModel: TintViewModel = hiltViewModel()
+) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -241,7 +252,10 @@ fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltVie
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.tint.value -= 1
+                if (viewModel.tint.floatValue > -1){
+                    viewModel.tint.floatValue -= 0.01f
+                    changeBitmap(viewModel, sharedVM)
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -263,58 +277,36 @@ fun TintSlider(modifier: Modifier = Modifier, viewModel: TintViewModel = hiltVie
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = String.format("%.0f", viewModel.tint.value),
+                        text = textTintFormat(viewModel.tint.floatValue),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RudeDark
                     )
                 }
             },
-            valueRange = 0f..60f,
-            value = viewModel.tint.value,
-            onValueChange = { viewModel.tint.value = it }
+            valueRange = -1f..1f,
+            value = viewModel.tint.floatValue,
+            onValueChange = {
+                if (it == -0.00f || ( it in -0.01f..0.01f)){
+                    viewModel.tint.floatValue = 0f
+                } else {
+                    viewModel.tint.floatValue = it
+                }
+                changeBitmap(viewModel, sharedVM)
+            }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.tint.value += 1
+                if (viewModel.tint.floatValue < 1){
+                    viewModel.tint.floatValue += 0.01f
+                    changeBitmap(viewModel, sharedVM)
+                }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"
         )
     }
-}
-
-
-fun Modifier.dashedBorder(
-    color: Color,
-    shape: Shape,
-    strokeWidth: Dp = 4.dp,
-    dashWidth: Dp = 8.dp,
-    gapWidth: Dp = 13.dp,
-    cap: StrokeCap = StrokeCap.Round
-) = this.drawWithContent {
-    val outline = shape.createOutline(size, layoutDirection, this)
-
-    val path = Path()
-    path.addOutline(outline)
-
-    val stroke = Stroke(
-        cap = cap,
-        width = strokeWidth.toPx(),
-        pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
-            phase = 0f
-        )
-    )
-
-    this.drawContent()
-
-    drawPath(
-        path = path,
-        style = stroke,
-        color = color
-    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -323,4 +315,12 @@ fun EditScreenPreview() {
     DOKATheme {
         TintScreen()
     }
+}
+
+fun changeBitmap(viewModel: TintViewModel, sharedVM: MainViewModel){
+    val originalBitmap = sharedVM.changedBitmap
+    sharedVM.currentBitmap = originalBitmap?.let {
+            bitmap -> changeTint(bitmap, viewModel.tint.floatValue)
+    }
+    sharedVM.tint.floatValue = viewModel.tint.floatValue
 }

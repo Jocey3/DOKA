@@ -30,17 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -49,7 +42,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
@@ -65,6 +57,8 @@ import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import com.doka.util.changeExposure
+import com.doka.util.loadCompressedBitmap
 
 
 @Composable
@@ -75,7 +69,7 @@ fun ExposureEScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: ExposureEViewModel = hiltViewModel()
 ) {
-    viewModel.exposure.value = sharedVM.exposure.value
+    viewModel.exposure.floatValue = sharedVM.exposure.floatValue
 
     ConstraintLayout(
         modifier = Modifier
@@ -190,7 +184,7 @@ fun BottomPanel(
     viewModel: ExposureEViewModel = hiltViewModel()
 ) {
     var exposureDefault = remember { sharedVM.exposure.floatValue }
-    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
     sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
@@ -209,7 +203,7 @@ fun BottomPanel(
                 modifier = Modifier
                     .clickable {
                         sharedVM.currentBitmap = sharedVM.changedBitmap
-                        sharedVM.exposure.value = exposureDefault
+                        sharedVM.exposure.floatValue = exposureDefault
                         navigateBack()
                     }
             )
@@ -260,6 +254,7 @@ fun ExposureESlider(
             modifier = Modifier.clickable {
                 if (viewModel.exposure.floatValue > 0) {
                     viewModel.exposure.floatValue -= 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
@@ -290,14 +285,10 @@ fun ExposureESlider(
                 }
             },
             valueRange = 0f..2f,
-            value = viewModel.exposure.value,
+            value = viewModel.exposure.floatValue,
             onValueChange = {
-                viewModel.exposure.value = it
-                val originalBitmap = sharedVM.changedBitmap
-                sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
-                    viewModel.changeExposure(bitmap, it)
-                }
-                sharedVM.exposure.floatValue = viewModel.exposure.floatValue
+                viewModel.exposure.floatValue = it
+                changeBitmap(viewModel, sharedVM)
             }
         )
 
@@ -305,6 +296,7 @@ fun ExposureESlider(
             modifier = Modifier.clickable {
                 if (viewModel.exposure.floatValue < 2) {
                     viewModel.exposure.floatValue += 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
@@ -313,42 +305,18 @@ fun ExposureESlider(
     }
 }
 
-
-fun Modifier.dashedBorder(
-    color: Color,
-    shape: Shape,
-    strokeWidth: Dp = 4.dp,
-    dashWidth: Dp = 8.dp,
-    gapWidth: Dp = 13.dp,
-    cap: StrokeCap = StrokeCap.Round
-) = this.drawWithContent {
-    val outline = shape.createOutline(size, layoutDirection, this)
-
-    val path = Path()
-    path.addOutline(outline)
-
-    val stroke = Stroke(
-        cap = cap,
-        width = strokeWidth.toPx(),
-        pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(dashWidth.toPx(), gapWidth.toPx()),
-            phase = 0f
-        )
-    )
-
-    this.drawContent()
-
-    drawPath(
-        path = path,
-        style = stroke,
-        color = color
-    )
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun EditScreenPreview() {
     DOKATheme {
         ExposureEScreen()
     }
+}
+
+fun changeBitmap(viewModel: ExposureEViewModel, sharedVM: MainViewModel) {
+    val originalBitmap = sharedVM.changedBitmap
+    sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+        changeExposure(bitmap, viewModel.exposure.floatValue)
+    }
+    sharedVM.exposure.floatValue = viewModel.exposure.floatValue
 }

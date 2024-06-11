@@ -1,12 +1,12 @@
 package com.doka.ui.screens.source_picture
 
 import android.graphics.BitmapFactory
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -30,18 +30,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import java.io.IOException
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,7 +55,6 @@ import com.doka.ui.theme.TextCancelColor
 import com.doka.ui.theme.TextSimpleColor
 import com.doka.util.ButtonDefault
 import com.doka.util.adjustedImage
-import java.io.IOException
 
 
 @Composable
@@ -119,7 +116,7 @@ fun BottomPanel(
                     val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
                     if (inputStream != null) {
                         sharedVM.currentBitmap =
-                            BitmapFactory.decodeStream(inputStream).adjustedImage()
+                            BitmapFactory.decodeStream(inputStream)
                         navigateNext.invoke()
                     }
                 } catch (e: IOException) {

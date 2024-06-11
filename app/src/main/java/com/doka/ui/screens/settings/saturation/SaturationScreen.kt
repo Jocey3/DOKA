@@ -57,6 +57,8 @@ import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import com.doka.util.changeBitmapSaturationOld
+import com.doka.util.loadCompressedBitmap
 
 @Composable
 fun SaturationScreen(
@@ -179,9 +181,9 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: SaturationViewModel = hiltViewModel()
 ) {
-    var saturationDefault = remember { sharedVM.saturation.floatValue }
-    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { sharedVM.loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
+    var saturationDefault = remember {sharedVM.saturation.floatValue}
+    sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
 
     Column(
         modifier = modifier
@@ -233,7 +235,8 @@ fun BottomPanel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaturationSlider(
-    modifier: Modifier = Modifier, sharedVM: MainViewModel,
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel,
     viewModel: SaturationViewModel = hiltViewModel()
 ) {
 
@@ -249,8 +252,9 @@ fun SaturationSlider(
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue > 0) {
+                if (viewModel.saturation.floatValue > 0){
                     viewModel.saturation.floatValue -= 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
@@ -284,18 +288,15 @@ fun SaturationSlider(
             value = viewModel.saturation.floatValue,
             onValueChange = {
                 viewModel.saturation.floatValue = it
-                val originalBitmap = sharedVM.changedBitmap
-                sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
-                    viewModel.changeBitmapSaturationOld(bitmap, it)
-                }
-                sharedVM.saturation.floatValue = viewModel.saturation.floatValue
+                changeBitmap(viewModel, sharedVM)
             }
         )
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue < 2) {
+                if (viewModel.saturation.floatValue < 2){
                     viewModel.saturation.floatValue += 0.01f
+                    changeBitmap(viewModel, sharedVM)
                 }
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
@@ -311,4 +312,12 @@ fun EditScreenPreview() {
     DOKATheme {
         SaturationScreen()
     }
+}
+
+fun changeBitmap(viewModel: SaturationViewModel, sharedVM: MainViewModel){
+    val originalBitmap = sharedVM.changedBitmap
+    sharedVM.currentBitmap = originalBitmap?.let {
+            bitmap -> changeBitmapSaturationOld(bitmap, viewModel.saturation.floatValue)
+    }
+    sharedVM.saturation.floatValue = viewModel.saturation.floatValue
 }

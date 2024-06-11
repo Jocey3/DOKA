@@ -7,5 +7,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TintViewModel @Inject constructor() : ViewModel() {
+
     val tint = mutableFloatStateOf(0f)
 }
