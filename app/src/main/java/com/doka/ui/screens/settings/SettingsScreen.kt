@@ -139,7 +139,7 @@ fun BottomPanel(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Spacer(modifier = Modifier.width(16.dp))
+
             }
         }
     }
