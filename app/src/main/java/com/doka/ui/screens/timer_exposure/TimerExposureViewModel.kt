@@ -29,9 +29,15 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
                     return@launch
                 }
                 timeLeft.value = i
-                progress.value = i.toFloat() / maxTime.value
+                for (j in 9 downTo 0) {
+                    if (paused.value) {
+                        return@launch
+                    }
+                    val fractionalProgress = i.toFloat() + (j.toFloat() / 10)
+                    progress.value = fractionalProgress / maxTime.value
+                    delay(100L)
+                }
                 timeSpent.value = ++timeSpent.value
-                delay(1000)
             }
             playBeepSound()
             navigateNext()

@@ -3,6 +3,15 @@ package com.doka.ui.screens.timer_exposure
 import android.annotation.SuppressLint
 import android.media.MediaPlayer
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.with
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -259,6 +268,7 @@ fun BottomPanel(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hiltViewModel()) {
@@ -276,12 +286,34 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
                 .height(70.dp)
                 .clip(RoundedCornerShape(40.dp))
         )
-        Text(
-            text = String.format("%d", viewModel.timeLeft.value),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = DarkTextColor
-        )
+        AnimatedContent(
+            targetState = viewModel.timeLeft.value,
+            transitionSpec = {
+                // Compare the incoming number with the previous number.
+                if (targetState > initialState) {
+                    // If the target number is larger, it slides up and fades in
+                    // while the initial (smaller) number slides up and fades out.
+                    (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                        slideOutVertically { height -> -height } + fadeOut())
+                } else {
+                    // If the target number is smaller, it slides down and fades in
+                    // while the initial number slides down and fades out.
+                    (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                        slideOutVertically { height -> height } + fadeOut())
+                }.using(
+                    // Disable clipping since the faded slide-in/out should
+                    // be displayed out of bounds.
+                    SizeTransform(clip = false)
+                )
+            }
+        ) { targetCount ->
+            Text(
+                text = String.format("%d", targetCount),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = DarkTextColor
+            )
+        }
     }
 }
 
