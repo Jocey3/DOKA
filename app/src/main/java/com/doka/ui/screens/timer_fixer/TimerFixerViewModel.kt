@@ -50,12 +50,16 @@ class TimerFixerViewModel @Inject constructor() : ViewModel() {
 
     private fun playBeeps() {
         viewModelScope.launch {
-            playBeepSound()
-            delay(800)
-            playBeepSound()
-            delay(800)
-            playBeepSound()
-            delay(500)
+            repeat(3) {
+                mediaPlayer?.apply {
+                    if (isPlaying) {
+                        stop()
+                    }
+                    seekTo(0)
+                    start()
+                }
+                delay(1000)
+            }
             navigateNext()
         }
     }

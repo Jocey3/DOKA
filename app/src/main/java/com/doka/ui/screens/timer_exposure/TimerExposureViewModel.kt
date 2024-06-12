@@ -42,17 +42,23 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
             playBeeps()
         }
     }
+
     private fun playBeeps() {
         viewModelScope.launch {
-            playBeepSound()
-            delay(800)
-            playBeepSound()
-            delay(800)
-            playBeepSound()
-            delay(500)
+            repeat(3) {
+                mediaPlayer?.apply {
+                    if (isPlaying) {
+                        stop()
+                    }
+                    seekTo(0)
+                    start()
+                }
+                delay(1000)
+            }
             navigateNext()
         }
     }
+
     fun pauseTimer() {
         paused.value = true
     }
@@ -60,10 +66,6 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     fun resumeTimer() {
         paused.value = false
         loadProgress()
-    }
-
-    fun playBeepSound() {
-        mediaPlayer?.start()
     }
 
     override fun onCleared() {
