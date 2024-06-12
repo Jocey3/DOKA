@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +40,7 @@ import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.FrameInnerColor
 import com.doka.ui.theme.RectangleBorderColor
+import com.doka.ui.theme.RedText
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.util.ButtonDefault
@@ -112,16 +114,16 @@ fun MainFrame(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(width = 179.dp, height = 127.dp)
                 .border(
-                    BorderStroke(2.dp, RectangleBorderColor),
-                    RoundedCornerShape(8.dp)
+                    BorderStroke(2.dp, RectangleBorderColor)
                 )
                 .background(FrameInnerColor)
                 .padding(2.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RectangleShape)
         ) {
             Text(
                 text = "Place photo paper here",
                 fontSize = 20.sp,
+                color = RedText,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(vertical = 30.dp, horizontal = 20.dp)

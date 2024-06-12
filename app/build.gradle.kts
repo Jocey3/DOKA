@@ -79,9 +79,6 @@ dependencies {
     // Hilt
     implementation(libs.google.dagger)
     implementation(libs.androidx.hilt)
-    implementation(libs.androidx.constraintlayout)
-    kapt(libs.google.hilt.compiler)
-    kapt(libs.androidx.hilt.compiler)
     kapt(libs.google.hilt.compiler)
     kapt(libs.androidx.hilt.compiler)
 

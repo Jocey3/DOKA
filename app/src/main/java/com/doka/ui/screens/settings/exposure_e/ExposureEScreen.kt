@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -138,12 +139,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
+            .border(BorderStroke(2.dp, RectangleBorderColor))
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RectangleShape)
 
     ) {
         sharedVM.currentBitmap?.let {

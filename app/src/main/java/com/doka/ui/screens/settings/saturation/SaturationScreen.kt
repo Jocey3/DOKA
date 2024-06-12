@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -137,12 +138,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
+            .border(BorderStroke(2.dp, RectangleBorderColor))
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RectangleShape)
 
     ) {
         sharedVM.currentBitmap?.let {
@@ -181,9 +179,9 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: SaturationViewModel = hiltViewModel()
 ) {
-    var saturationDefault = remember {sharedVM.saturation.floatValue}
+    var saturationDefault = remember { sharedVM.saturation.floatValue }
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
         modifier = modifier
@@ -252,7 +250,7 @@ fun SaturationSlider(
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue > 0){
+                if (viewModel.saturation.floatValue > 0) {
                     viewModel.saturation.floatValue -= 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -294,7 +292,7 @@ fun SaturationSlider(
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue < 2){
+                if (viewModel.saturation.floatValue < 2) {
                     viewModel.saturation.floatValue += 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -314,10 +312,10 @@ fun EditScreenPreview() {
     }
 }
 
-fun changeBitmap(viewModel: SaturationViewModel, sharedVM: MainViewModel){
+fun changeBitmap(viewModel: SaturationViewModel, sharedVM: MainViewModel) {
     val originalBitmap = sharedVM.changedBitmap
-    sharedVM.currentBitmap = originalBitmap?.let {
-            bitmap -> changeBitmapSaturationOld(bitmap, viewModel.saturation.floatValue)
+    sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+        changeBitmapSaturationOld(bitmap, viewModel.saturation.floatValue)
     }
     sharedVM.saturation.floatValue = viewModel.saturation.floatValue
 }

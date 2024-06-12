@@ -35,6 +35,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.addOutline
@@ -146,12 +147,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
+            .border(BorderStroke(2.dp, RectangleBorderColor))
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RectangleShape)
 
     ) {
         sharedVM.currentBitmap?.let {
@@ -192,9 +190,9 @@ fun BottomPanel(
     viewModel: ContrastViewModel = hiltViewModel()
 ) {
 
-    var contrastDefault = remember {sharedVM.contrast.floatValue}
+    var contrastDefault = remember { sharedVM.contrast.floatValue }
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
         modifier = modifier
@@ -244,8 +242,10 @@ fun BottomPanel(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
-                   viewModel: ContrastViewModel = hiltViewModel()) {
+fun ContrastSlider(
+    modifier: Modifier = Modifier, sharedVM: MainViewModel,
+    viewModel: ContrastViewModel = hiltViewModel()
+) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
         activeTrackColor = TextSimpleColor,
@@ -259,7 +259,7 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.contrast.floatValue > 0){
+                if (viewModel.contrast.floatValue > 0) {
                     viewModel.contrast.floatValue -= 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -301,7 +301,7 @@ fun ContrastSlider(modifier: Modifier = Modifier, sharedVM: MainViewModel,
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.contrast.floatValue < 2){
+                if (viewModel.contrast.floatValue < 2) {
                     viewModel.contrast.floatValue += 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -320,10 +320,10 @@ fun EditScreenPreview() {
     }
 }
 
-fun changeBitmap(viewModel: ContrastViewModel, sharedVM: MainViewModel){
+fun changeBitmap(viewModel: ContrastViewModel, sharedVM: MainViewModel) {
     val originalBitmap = sharedVM.changedBitmap
-    sharedVM.currentBitmap = originalBitmap?.let {
-            bitmap -> changeContrast(bitmap, viewModel.contrast.floatValue)
+    sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+        changeContrast(bitmap, viewModel.contrast.floatValue)
     }
     sharedVM.contrast.floatValue = viewModel.contrast.floatValue
 }

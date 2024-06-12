@@ -17,6 +17,7 @@ val RudeMid = Color(0xFF391616)
 val RudeLight = Color(0xFF6D2C2C)
 val RudeStartProgress = Color(0xFF6D2C2C)
 val RedClick = Color(0xFFA53232)
+val RedText = Color(0xFFB52424)
 
 val ButtonBackgroundColor = Color(0xFF8D3737)
 val ButtonTextColor = Color(0xFF250101)

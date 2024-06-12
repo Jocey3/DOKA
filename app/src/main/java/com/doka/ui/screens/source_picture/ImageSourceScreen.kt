@@ -73,7 +73,6 @@ fun ImageSourceScreen(
             .fillMaxSize()
             .background(RudeDark)
     ) {
-        Log.d("LogsDd", "Full recomposition")
         val (bottomPanel) = createRefs()
         Box(
             modifier = Modifier

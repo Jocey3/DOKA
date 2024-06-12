@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -138,13 +139,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
+            .border(BorderStroke(2.dp, RectangleBorderColor))
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
-
+            .clip(RectangleShape)
     ) {
         sharedVM.currentBitmap?.let {
             Image(
@@ -184,9 +181,9 @@ fun BottomPanel(
     viewModel: TintViewModel = hiltViewModel()
 ) {
 
-    var tintDefault = remember {sharedVM.tint.floatValue}
+    var tintDefault = remember { sharedVM.tint.floatValue }
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
         modifier = modifier
@@ -236,9 +233,10 @@ fun BottomPanel(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TintSlider(modifier: Modifier = Modifier,
-               sharedVM: MainViewModel,
-               viewModel: TintViewModel = hiltViewModel()
+fun TintSlider(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel,
+    viewModel: TintViewModel = hiltViewModel()
 ) {
     val colors = SliderDefaults.colors(
         thumbColor = ButtonBackgroundColor,
@@ -252,7 +250,7 @@ fun TintSlider(modifier: Modifier = Modifier,
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.tint.floatValue > -1){
+                if (viewModel.tint.floatValue > -1) {
                     viewModel.tint.floatValue -= 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -287,7 +285,7 @@ fun TintSlider(modifier: Modifier = Modifier,
             valueRange = -1f..1f,
             value = viewModel.tint.floatValue,
             onValueChange = {
-                if (it == -0.00f || ( it in -0.01f..0.01f)){
+                if (it == -0.00f || (it in -0.01f..0.01f)) {
                     viewModel.tint.floatValue = 0f
                 } else {
                     viewModel.tint.floatValue = it
@@ -298,7 +296,7 @@ fun TintSlider(modifier: Modifier = Modifier,
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.tint.floatValue < 1){
+                if (viewModel.tint.floatValue < 1) {
                     viewModel.tint.floatValue += 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -317,10 +315,10 @@ fun EditScreenPreview() {
     }
 }
 
-fun changeBitmap(viewModel: TintViewModel, sharedVM: MainViewModel){
+fun changeBitmap(viewModel: TintViewModel, sharedVM: MainViewModel) {
     val originalBitmap = sharedVM.changedBitmap
-    sharedVM.currentBitmap = originalBitmap?.let {
-            bitmap -> changeTint(bitmap, viewModel.tint.floatValue)
+    sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+        changeTint(bitmap, viewModel.tint.floatValue)
     }
     sharedVM.tint.floatValue = viewModel.tint.floatValue
 }
