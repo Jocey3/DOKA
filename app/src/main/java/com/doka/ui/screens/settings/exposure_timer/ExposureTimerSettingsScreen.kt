@@ -25,7 +25,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,7 +68,9 @@ fun ExposureTimerSettingsScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: ExposureTimerViewModel = hiltViewModel()
 ) {
-    viewModel.timer.floatValue = remember { sharedVM.timeForExposure.value }
+    LaunchedEffect(sharedVM.timeForExposure.value) {
+        viewModel.timer.floatValue = sharedVM.timeForExposure.value
+    }
 
     ConstraintLayout(
         modifier = Modifier
