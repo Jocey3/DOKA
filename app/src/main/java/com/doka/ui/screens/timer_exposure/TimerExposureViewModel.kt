@@ -39,11 +39,20 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
                 }
                 timeSpent.value = ++timeSpent.value
             }
+            playBeeps()
+        }
+    }
+    private fun playBeeps() {
+        viewModelScope.launch {
             playBeepSound()
+            delay(800)
+            playBeepSound()
+            delay(800)
+            playBeepSound()
+            delay(500)
             navigateNext()
         }
     }
-
     fun pauseTimer() {
         paused.value = true
     }
