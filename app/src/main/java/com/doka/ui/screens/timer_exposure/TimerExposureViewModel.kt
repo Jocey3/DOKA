@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -12,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimerExposureViewModel @Inject constructor() : ViewModel() {
-    val maxTime = mutableStateOf(60)
+    val maxTime = mutableStateOf(60_000L)
     val timeLeft = mutableStateOf(maxTime.value)
     val timeSpent = mutableStateOf(0)
     val progress = mutableStateOf(1f)
@@ -21,31 +22,26 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     var mediaPlayer: MediaPlayer? = null
 
     private var timerJob: Job? = null
+    private val interval = 100L
+
     fun loadProgress() {
-        timerJob?.cancel() // Cancel the previous timer job if any
+        timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            for (i in maxTime.value - timeSpent.value downTo 0) {
-                if (paused.value) {
-                    return@launch
-                }
-                timeLeft.value = i
-                for (j in 9 downTo 0) {
-                    if (paused.value) {
-                        return@launch
-                    }
-                    val fractionalProgress = i.toFloat() + (j.toFloat() / 10)
-                    progress.value = fractionalProgress / maxTime.value
-                    delay(100L)
-                }
-                timeSpent.value = ++timeSpent.value
+            for (i in (maxTime.value - timeSpent.value) downTo 0 step interval) {
+                if (paused.value) return@launch
+                delay(interval)
+                timeSpent.value += interval.toInt()
+                timeLeft.value = (maxTime.value - timeSpent.value) / 1000
+                progress.value = 1f - (timeSpent.value.toFloat() / maxTime.value.toFloat())
             }
             playBeeps()
         }
     }
 
     private fun playBeeps() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             repeat(3) {
+                delay(500)
                 mediaPlayer?.apply {
                     if (isPlaying) {
                         stop()
@@ -53,7 +49,7 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
                     seekTo(0)
                     start()
                 }
-                delay(1000)
+                delay(500)
             }
             navigateNext()
         }

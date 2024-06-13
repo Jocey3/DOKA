@@ -83,7 +83,7 @@ fun TimerExposureScreen(
 ) {
     val context = LocalContext.current
     LaunchedEffect(sharedVM.timeForExposure.value) {
-        viewModel.maxTime.value = sharedVM.timeForExposure.value.toInt()
+        viewModel.maxTime.value = sharedVM.timeForExposure.value.toLong() * 1000L
         viewModel.loadProgress()
     }
     viewModel.mediaPlayer = remember { MediaPlayer.create(context, R.raw.beep_sound) }
