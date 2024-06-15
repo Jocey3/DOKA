@@ -1,9 +1,7 @@
 package com.doka.ui.screens.exposure
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,10 +34,8 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.FrameInnerColor
-import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RedText
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
@@ -79,7 +75,6 @@ fun ExposureScreen(
             MainFrame(
                 modifier = Modifier
                     .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp))
             )
         }
         Box(
@@ -113,9 +108,6 @@ fun MainFrame(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(width = 179.dp, height = 127.dp)
-                .border(
-                    BorderStroke(2.dp, RectangleBorderColor)
-                )
                 .background(FrameInnerColor)
                 .padding(2.dp)
                 .clip(RectangleShape)

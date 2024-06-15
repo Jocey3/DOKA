@@ -1,10 +1,8 @@
 package com.doka.ui.screens.edit
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -53,7 +51,6 @@ import com.doka.ImageSettings
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.DOKATheme
-import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
@@ -93,8 +90,7 @@ fun EditScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
+                    .size(width = 330.dp, height = 220.dp),
                 sharedVM = sharedVM
             )
         }
@@ -164,7 +160,6 @@ fun FrameWithImage(
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(BorderStroke(2.dp, RectangleBorderColor))
             .padding(2.dp)
             .clip(RectangleShape)
     ) {

@@ -1,9 +1,7 @@
 package com.doka.ui.screens.settings.contrast
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,18 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -49,7 +40,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
@@ -58,15 +48,11 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.edit.dashedBorder
-import com.doka.ui.screens.settings.saturation.SaturationViewModel
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
-import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
-import com.doka.util.changeBitmapSaturationOld
 import com.doka.util.changeContrast
 import com.doka.util.loadCompressedBitmap
 
@@ -103,8 +89,7 @@ fun ContrastScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
+                    .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
         }
@@ -147,7 +132,6 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(BorderStroke(2.dp, RectangleBorderColor))
             .padding(2.dp)
             .clip(RectangleShape)
 

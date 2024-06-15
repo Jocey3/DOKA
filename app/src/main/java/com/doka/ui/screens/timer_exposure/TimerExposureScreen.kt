@@ -11,10 +11,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,11 +59,9 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.DarkTextColor
-import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RedClick
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
@@ -115,8 +111,7 @@ fun TimerExposureScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
+                    .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
         }
@@ -166,7 +161,6 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(BorderStroke(2.dp, RectangleBorderColor))
             .padding(2.dp)
             .clip(RectangleShape)
 

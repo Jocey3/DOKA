@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,14 +47,17 @@ class TimerDeveloperViewModel @Inject constructor() : ViewModel() {
     private fun playBeeps() {
         viewModelScope.launch(Dispatchers.Default) {
             repeat(3) {
-                mediaPlayer?.apply {
-                    if (isPlaying) {
-                        stop()
-                    }
-                    seekTo(0)
-                    start()
-                }
-                delay(1000)
+                async {
+                    mediaPlayer?.start()
+                    delay(1000)
+                }.await()
+            }
+            delay(1000)
+            repeat(3) {
+                async {
+                    mediaPlayer?.start()
+                    delay(1000)
+                }.await()
             }
             navigateNext()
         }
