@@ -7,6 +7,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExposureTimerViewModel @Inject constructor() : ViewModel() {
-    val timer = mutableFloatStateOf(0f)
+    val timer = mutableFloatStateOf(20f)
 
 }

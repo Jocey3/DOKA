@@ -161,7 +161,6 @@ fun FrameWithImage(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
             .padding(2.dp)
-            .clip(RectangleShape)
     ) {
         sharedVM.currentBitmap?.let {
             Image(

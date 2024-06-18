@@ -1,7 +1,9 @@
 package com.doka.ui.screens.timer_exposure
 
 import android.media.MediaPlayer
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimerExposureViewModel @Inject constructor() : ViewModel() {
+    var mainFrameVisible by mutableStateOf(true)
     val maxTime = mutableStateOf(60_000L)
     val timeLeft = mutableStateOf(maxTime.value)
     val timeSpent = mutableStateOf(0)
@@ -22,7 +25,9 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     var navigateNext: () -> Unit = {}
     var mediaPlayer: MediaPlayer? = null
 
+
     private var timerJob: Job? = null
+    private var soundJob: Job? = null
     private val interval = 100L
 
     fun loadProgress() {
@@ -35,12 +40,13 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
                 timeLeft.value = (maxTime.value - timeSpent.value) / 1000
                 progress.value = 1f - (timeSpent.value.toFloat() / maxTime.value.toFloat())
             }
-            playBeeps()
+            mainFrameVisible = false
+            if (soundJob == null) playBeeps()
         }
     }
 
     private fun playBeeps() {
-        viewModelScope.launch(Dispatchers.Default) {
+        soundJob = viewModelScope.launch(Dispatchers.Default) {
             repeat(3) {
                 async {
                     mediaPlayer?.start()
@@ -59,10 +65,12 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     }
 
     fun pauseTimer() {
+        if (timeLeft.value > 0) mainFrameVisible = false
         paused.value = true
     }
 
     fun resumeTimer() {
+        if (timeLeft.value > 0) mainFrameVisible = true
         paused.value = false
         loadProgress()
     }
