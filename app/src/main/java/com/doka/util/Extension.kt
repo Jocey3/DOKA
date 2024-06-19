@@ -17,6 +17,7 @@ import android.graphics.PorterDuffColorFilter
 import android.media.AudioManager
 import android.os.Build
 import android.view.WindowManager
+import com.doka.R
 import okhttp3.ResponseBody
 import java.io.ByteArrayOutputStream
 
@@ -29,7 +30,7 @@ fun Activity.setAppSettings() {
         0
     )
 
-    window.navigationBarColor = Color.parseColor("#250101")
+    window.navigationBarColor = getColor(R.color.background)
 
     val lp = window.attributes
     lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
