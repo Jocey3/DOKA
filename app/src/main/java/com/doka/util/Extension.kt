@@ -29,7 +29,7 @@ fun Activity.setAppSettings() {
         0
     )
 
-    window.navigationBarColor = Color.parseColor("#250101")
+    //window.navigationBarColor = Color.parseColor("#250101")
 
     val lp = window.attributes
     lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
