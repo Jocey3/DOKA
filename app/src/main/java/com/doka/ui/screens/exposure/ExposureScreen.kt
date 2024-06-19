@@ -1,13 +1,10 @@
 package com.doka.ui.screens.exposure
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -15,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,26 +23,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.FrameInnerColor
-import com.doka.ui.theme.RectangleBorderColor
+import com.doka.ui.theme.RedText
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.util.ButtonDefault
 import com.doka.util.negative
-import com.doka.util.noir
 
 
 @Composable
@@ -78,8 +77,7 @@ fun ExposureScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp))
+                    .size(width = 330.dp, height = 220.dp), sharedVM
             )
         }
         Box(
@@ -103,27 +101,30 @@ fun ExposureScreen(
 }
 
 @Composable
-fun MainFrame(modifier: Modifier = Modifier) {
+fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
-        contentAlignment = Alignment.Center,
         modifier = modifier
             .clipToBounds()
+            .offset {
+                Offset(
+                    sharedVM.savedImagesSettings.value.offsetX,
+                    sharedVM.savedImagesSettings.value.offsetY
+                ).round()
+            }
     ) {
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(width = 179.dp, height = 127.dp)
-                .border(
-                    BorderStroke(2.dp, RectangleBorderColor),
-                    RoundedCornerShape(8.dp)
-                )
                 .background(FrameInnerColor)
                 .padding(2.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RectangleShape)
         ) {
             Text(
                 text = "Place photo paper here",
                 fontSize = 20.sp,
+                color = RedText,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(vertical = 30.dp, horizontal = 20.dp)
@@ -179,11 +180,15 @@ fun BottomPanel(
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-
-        ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Expose") {
+        ButtonDefault(
+            modifier = Modifier
+                .fillMaxWidth(), text = "Expose"
+        ) {
+            sharedVM.beforeExposure = sharedVM.currentBitmap
             sharedVM.currentBitmap = sharedVM.currentBitmap?.negative()
             navigateExpose()
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 

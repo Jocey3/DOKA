@@ -3,10 +3,16 @@ package com.doka.ui.screens.timer_exposure
 import android.annotation.SuppressLint
 import android.media.MediaPlayer
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,11 +58,10 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.DarkTextColor
-import com.doka.ui.theme.RectangleBorderColor
+import com.doka.ui.theme.RedClick
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
@@ -73,7 +78,7 @@ fun TimerExposureScreen(
 ) {
     val context = LocalContext.current
     LaunchedEffect(sharedVM.timeForExposure.value) {
-        viewModel.maxTime.value = sharedVM.timeForExposure.value.toInt()
+        viewModel.maxTime.value = sharedVM.timeForExposure.value.toLong() * 1000L
         viewModel.loadProgress()
     }
     viewModel.mediaPlayer = remember { MediaPlayer.create(context, R.raw.beep_sound) }
@@ -105,8 +110,7 @@ fun TimerExposureScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
+                    .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
         }
@@ -139,15 +143,17 @@ fun MainFrame(
         modifier = modifier
             .clipToBounds()
     ) {
-        FrameWithImage(
-            modifier = Modifier
-                .offset {
-                    Offset(
-                        sharedVM.savedImagesSettings.value.offsetX,
-                        sharedVM.savedImagesSettings.value.offsetY
-                    ).round()
-                }, sharedVM = sharedVM
-        )
+        if (viewModel.mainFrameVisible) {
+            FrameWithImage(
+                modifier = Modifier
+                    .offset {
+                        Offset(
+                            sharedVM.savedImagesSettings.value.offsetX,
+                            sharedVM.savedImagesSettings.value.offsetY
+                        ).round()
+                    }, sharedVM = sharedVM
+            )
+        }
     }
 }
 
@@ -156,13 +162,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
-
     ) {
         sharedVM.currentBitmap?.let {
             Image(
@@ -252,10 +252,13 @@ fun BottomPanel(
 
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
         Timer()
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hiltViewModel()) {
@@ -267,18 +270,40 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
         LinearProgressIndicator(
             progress = { viewModel.progress.value },
             color = RudeLight,
-            trackColor = ButtonBackgroundColor,
+            trackColor = if (viewModel.timeLeft.value <= 0) RedClick else ButtonBackgroundColor,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
                 .clip(RoundedCornerShape(40.dp))
         )
-        Text(
-            text = String.format("%d", viewModel.timeLeft.value),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = DarkTextColor
-        )
+        AnimatedContent(
+            targetState = viewModel.timeLeft.value,
+            transitionSpec = {
+                // Compare the incoming number with the previous number.
+                if (targetState > initialState) {
+                    // If the target number is larger, it slides up and fades in
+                    // while the initial (smaller) number slides up and fades out.
+                    (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                        slideOutVertically { height -> -height } + fadeOut())
+                } else {
+                    // If the target number is smaller, it slides down and fades in
+                    // while the initial number slides down and fades out.
+                    (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                        slideOutVertically { height -> height } + fadeOut())
+                }.using(
+                    // Disable clipping since the faded slide-in/out should
+                    // be displayed out of bounds.
+                    SizeTransform(clip = false)
+                )
+            }
+        ) { targetCount ->
+            Text(
+                text = String.format("%d", targetCount),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = DarkTextColor
+            )
+        }
     }
 }
 

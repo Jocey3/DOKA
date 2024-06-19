@@ -1,21 +1,21 @@
 package com.doka.ui.screens.settings.saturation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -48,10 +47,8 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
-import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
@@ -91,8 +88,7 @@ fun SaturationScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
+                    .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
         }
@@ -135,13 +131,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
-
     ) {
         sharedVM.currentBitmap?.let {
             Image(
@@ -179,9 +169,9 @@ fun BottomPanel(
     sharedVM: MainViewModel,
     viewModel: SaturationViewModel = hiltViewModel()
 ) {
-    var saturationDefault = remember {sharedVM.saturation.floatValue}
+    var saturationDefault = remember { sharedVM.saturation.floatValue }
     sharedVM.currentBitmap = sharedVM.currentBitmap?.let { loadCompressedBitmap(it) }
-    sharedVM.changedBitmap = remember { sharedVM.currentBitmap}
+    sharedVM.changedBitmap = remember { sharedVM.currentBitmap }
 
     Column(
         modifier = modifier
@@ -202,8 +192,8 @@ fun BottomPanel(
                         sharedVM.saturation.floatValue = saturationDefault
                         navigateBack()
                     }
-                    .padding(end = 16.dp)
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 modifier = Modifier.weight(1f),
                 text = "Saturation",
@@ -212,6 +202,7 @@ fun BottomPanel(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
@@ -222,7 +213,6 @@ fun BottomPanel(
                         sharedVM.saturation.floatValue = viewModel.saturation.floatValue
                         navigateNext()
                     }
-                    .padding(start = 16.dp)
             )
         }
         SaturationSlider(modifier = Modifier.weight(1f), sharedVM)
@@ -250,7 +240,7 @@ fun SaturationSlider(
     ) {
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue > 0){
+                if (viewModel.saturation.floatValue > 0) {
                     viewModel.saturation.floatValue -= 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -292,7 +282,7 @@ fun SaturationSlider(
 
         Image(
             modifier = Modifier.clickable {
-                if (viewModel.saturation.floatValue < 2){
+                if (viewModel.saturation.floatValue < 2) {
                     viewModel.saturation.floatValue += 0.01f
                     changeBitmap(viewModel, sharedVM)
                 }
@@ -312,10 +302,10 @@ fun EditScreenPreview() {
     }
 }
 
-fun changeBitmap(viewModel: SaturationViewModel, sharedVM: MainViewModel){
+fun changeBitmap(viewModel: SaturationViewModel, sharedVM: MainViewModel) {
     val originalBitmap = sharedVM.changedBitmap
-    sharedVM.currentBitmap = originalBitmap?.let {
-            bitmap -> changeBitmapSaturationOld(bitmap, viewModel.saturation.floatValue)
+    sharedVM.currentBitmap = originalBitmap?.let { bitmap ->
+        changeBitmapSaturationOld(bitmap, viewModel.saturation.floatValue)
     }
     sharedVM.saturation.floatValue = viewModel.saturation.floatValue
 }

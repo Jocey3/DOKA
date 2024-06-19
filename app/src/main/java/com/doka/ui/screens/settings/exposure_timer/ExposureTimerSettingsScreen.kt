@@ -1,21 +1,21 @@
 package com.doka.ui.screens.settings.exposure_timer
 
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,10 +23,9 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -48,10 +47,8 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.edit.dashedBorder
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
-import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
@@ -65,7 +62,9 @@ fun ExposureTimerSettingsScreen(
     sharedVM: MainViewModel = hiltViewModel(),
     viewModel: ExposureTimerViewModel = hiltViewModel()
 ) {
-    viewModel.timer.floatValue = remember { sharedVM.timeForExposure.value }
+    LaunchedEffect(sharedVM.timeForExposure.value) {
+        viewModel.timer.floatValue = sharedVM.timeForExposure.value
+    }
 
     ConstraintLayout(
         modifier = Modifier
@@ -90,8 +89,7 @@ fun ExposureTimerSettingsScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
+                    .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
         }
@@ -141,13 +139,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
-
     ) {
         sharedVM.currentBitmap?.let {
             Image(
@@ -201,8 +193,8 @@ fun BottomPanel(
                 contentDescription = "Button back",
                 modifier = Modifier
                     .clickable { navigateBack() }
-                    .padding(end = 16.dp)
             )
+            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 modifier = Modifier.weight(1f),
                 text = "Exp. timer",
@@ -211,7 +203,7 @@ fun BottomPanel(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold
             )
-
+            Spacer(modifier = Modifier.width(16.dp))
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
                 contentDescription = "Button Next",
@@ -220,7 +212,6 @@ fun BottomPanel(
                         sharedVM.timeForExposure.value = viewModel.timer.floatValue
                         navigateNext()
                     }
-                    .padding(start = 16.dp)
             )
         }
 
@@ -244,7 +235,8 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
     ) {
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.floatValue -= 1
+                if (viewModel.timer.floatValue > 20)
+                    viewModel.timer.floatValue -= 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_minus),
             contentDescription = "Minus"
@@ -273,14 +265,15 @@ fun TimeSlider(modifier: Modifier = Modifier, viewModel: ExposureTimerViewModel 
                     )
                 }
             },
-            valueRange = 0f..60f,
+            valueRange = 20f..90f,
             value = viewModel.timer.floatValue,
             onValueChange = { viewModel.timer.floatValue = it }
         )
 
         Image(
             modifier = Modifier.clickable {
-                viewModel.timer.floatValue += 1
+                if (viewModel.timer.floatValue <= 89)
+                    viewModel.timer.floatValue += 1
             },
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_plus),
             contentDescription = "Plus"

@@ -1,18 +1,23 @@
 package com.doka.ui.screens.timer_exposure
 
 import android.media.MediaPlayer
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TimerExposureViewModel @Inject constructor() : ViewModel() {
-    val maxTime = mutableStateOf(60)
+    var mainFrameVisible by mutableStateOf(true)
+    val maxTime = mutableStateOf(60_000L)
     val timeLeft = mutableStateOf(maxTime.value)
     val timeSpent = mutableStateOf(0)
     val progress = mutableStateOf(1f)
@@ -20,35 +25,54 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     var navigateNext: () -> Unit = {}
     var mediaPlayer: MediaPlayer? = null
 
+
     private var timerJob: Job? = null
+    private var soundJob: Job? = null
+    private val interval = 100L
+
     fun loadProgress() {
-        timerJob?.cancel() // Cancel the previous timer job if any
+        timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            for (i in maxTime.value - timeSpent.value downTo 0) {
-                if (paused.value) {
-                    return@launch
-                }
-                timeLeft.value = i
-                progress.value = i.toFloat() / maxTime.value
-                timeSpent.value = ++timeSpent.value
-                delay(1000)
+            for (i in (maxTime.value - timeSpent.value) downTo 0 step interval) {
+                if (paused.value) return@launch
+                delay(interval)
+                timeSpent.value += interval.toInt()
+                timeLeft.value = (maxTime.value - timeSpent.value) / 1000
+                progress.value = 1f - (timeSpent.value.toFloat() / maxTime.value.toFloat())
             }
-            playBeepSound()
+            mainFrameVisible = false
+            if (soundJob == null) playBeeps()
+        }
+    }
+
+    private fun playBeeps() {
+        soundJob = viewModelScope.launch(Dispatchers.Default) {
+            repeat(3) {
+                async {
+                    mediaPlayer?.start()
+                    delay(1000)
+                }.await()
+            }
+            delay(1000)
+            repeat(3) {
+                async {
+                    mediaPlayer?.start()
+                    delay(1000)
+                }.await()
+            }
             navigateNext()
         }
     }
 
     fun pauseTimer() {
+        if (timeLeft.value > 0) mainFrameVisible = false
         paused.value = true
     }
 
     fun resumeTimer() {
+        if (timeLeft.value > 0) mainFrameVisible = true
         paused.value = false
         loadProgress()
-    }
-
-    fun playBeepSound() {
-        mediaPlayer?.start()
     }
 
     override fun onCleared() {

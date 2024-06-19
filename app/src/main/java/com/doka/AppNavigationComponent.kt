@@ -1,5 +1,8 @@
 package com.doka
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,14 +16,15 @@ import com.doka.ui.screens.exposure.ExposureScreen
 import com.doka.ui.screens.settings.SettingsScreen
 import com.doka.ui.screens.settings.contrast.ContrastScreen
 import com.doka.ui.screens.settings.exposure_e.ExposureEScreen
+import com.doka.ui.screens.settings.exposure_timer.ExposureTimerSettingsScreen
 import com.doka.ui.screens.settings.saturation.SaturationScreen
 import com.doka.ui.screens.settings.tint.TintScreen
-import com.doka.ui.screens.settings.exposure_timer.ExposureTimerSettingsScreen
 import com.doka.ui.screens.source_picture.ImageSourceScreen
 import com.doka.ui.screens.splash.SplashScreen
 import com.doka.ui.screens.timer_developer.TimerDeveloperScreen
 import com.doka.ui.screens.timer_exposure.TimerExposureScreen
 import com.doka.ui.screens.timer_fixer.TimerFixerScreen
+import com.doka.util.negative
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -32,6 +36,7 @@ fun NavigationComponent(
 
     LaunchedEffect("navigation") {
         navigator.sharedFlow.onEach {
+
             navController.navigate(it.label)
         }.launchIn(this)
     }
@@ -40,7 +45,13 @@ fun NavigationComponent(
 
     NavHost(
         navController = navController,
-        startDestination = NavTarget.Splash.label
+        startDestination = NavTarget.Splash.label,
+        enterTransition = {
+            fadeIn(animationSpec = tween(500))
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(500))
+        }
     ) {
         composable(NavTarget.Splash.label) {
             SplashScreen(
@@ -74,21 +85,30 @@ fun NavigationComponent(
         ) {
             TimerExposureScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.TimerDeveloper) },
-                navigateBack = { navController.popBackStack(NavTarget.Exposure.label, false) },
+                navigateBack = {
+                    sharedVM.currentBitmap = sharedVM.beforeExposure
+                    navController.popBackStack(NavTarget.Exposure.label, false)
+                },
                 sharedVM = sharedVM
             )
         }
         composable(NavTarget.TimerDeveloper.label) {
             TimerDeveloperScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.TimerFixer) },
-                navigateBack = { navController.popBackStack(NavTarget.Exposure.label, false) },
+                navigateBack = {
+                    sharedVM.currentBitmap = sharedVM.beforeExposure
+                    navController.popBackStack(NavTarget.Exposure.label, false)
+                },
                 sharedVM = sharedVM
             )
         }
         composable(NavTarget.TimerFixer.label) {
             TimerFixerScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.Done) },
-                navigateBack = { navController.popBackStack(NavTarget.Exposure.label, false) },
+                navigateBack = {
+                    sharedVM.currentBitmap = sharedVM.beforeExposure
+                    navController.popBackStack(NavTarget.Exposure.label, false)
+                },
                 sharedVM = sharedVM
             )
         }
@@ -113,7 +133,8 @@ fun NavigationComponent(
             ExposureTimerSettingsScreen(
                 navigateNext = { navController.popBackStack() },
                 navigateBack = { navController.popBackStack() },
-                sharedVM = sharedVM)
+                sharedVM = sharedVM
+            )
         }
         composable(NavTarget.ExposureTimer.label) {
             ExposureTimerSettingsScreen(

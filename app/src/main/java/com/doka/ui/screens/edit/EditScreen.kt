@@ -1,22 +1,22 @@
 package com.doka.ui.screens.edit
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.addOutline
@@ -50,7 +51,6 @@ import com.doka.ImageSettings
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.DOKATheme
-import com.doka.ui.theme.RectangleBorderColor
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
@@ -90,8 +90,7 @@ fun EditScreen(
         ) {
             MainFrame(
                 modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp)
-                    .dashedBorder(RectangleBorderColor, RoundedCornerShape(12.dp)),
+                    .size(width = 330.dp, height = 220.dp),
                 sharedVM = sharedVM
             )
         }
@@ -161,13 +160,7 @@ fun FrameWithImage(
     Box(
         modifier = modifier
             .size(width = 179.dp, height = 127.dp)
-            .border(
-                BorderStroke(2.dp, RectangleBorderColor),
-                RoundedCornerShape(8.dp)
-            )
             .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
-
     ) {
         sharedVM.currentBitmap?.let {
             Image(
@@ -222,11 +215,11 @@ fun BottomPanel(
             contentDescription = "Button back",
             modifier = Modifier
                 .clickable { navigateBack() }
-                .padding(end = 16.dp)
+
         )
-
+        Spacer(modifier = Modifier.width(16.dp))
         TouchPanel(modifier = Modifier.weight(1f), sharedVM = sharedVM)
-
+        Spacer(modifier = Modifier.width(16.dp))
         Image(
             imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
             contentDescription = "Button Next",
@@ -240,7 +233,6 @@ fun BottomPanel(
                     )
                     navigateNext()
                 }
-                .padding(start = 16.dp)
         )
     }
 }

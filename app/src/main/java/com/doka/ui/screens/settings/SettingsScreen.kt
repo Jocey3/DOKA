@@ -140,6 +140,7 @@ fun BottomPanel(
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
+
             }
         }
     }
