@@ -15,9 +15,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.media.AudioManager
-import android.os.Build
 import android.view.WindowManager
-import com.doka.R
 import okhttp3.ResponseBody
 import java.io.ByteArrayOutputStream
 
@@ -29,8 +27,6 @@ fun Activity.setAppSettings() {
         am.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
         0
     )
-
-    window.navigationBarColor = getColor(R.color.background)
 
     val lp = window.attributes
     lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
@@ -128,11 +124,13 @@ fun changeTint(bitmap: Bitmap, tintValue: Float): Bitmap {
             val greenComponent = (255 * (1 - tintValue)).toInt()
             Color.argb(40, 0, greenComponent, blue)
         }
+
         tintValue > 0 -> {
             val redComponent = 255
             val greenComponent = (255 * (1 - tintValue)).toInt()
             Color.argb(40, redComponent, greenComponent, 0)
         }
+
         else -> {
             Color.argb(0, 0, 0, 0)
         }
@@ -145,8 +143,14 @@ fun changeTint(bitmap: Bitmap, tintValue: Float): Bitmap {
 
 fun changeBitmapSaturationOptimized(bitmap: Bitmap, saturation: Float): Bitmap {
     val scale = 0.5f
-    val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), true)
-    val newBitmap = Bitmap.createBitmap(scaledBitmap.width, scaledBitmap.height, scaledBitmap.config)
+    val scaledBitmap = Bitmap.createScaledBitmap(
+        bitmap,
+        (bitmap.width * scale).toInt(),
+        (bitmap.height * scale).toInt(),
+        true
+    )
+    val newBitmap =
+        Bitmap.createBitmap(scaledBitmap.width, scaledBitmap.height, scaledBitmap.config)
     val colorMatrix = ColorMatrix()
     colorMatrix.setSaturation(saturation)
     val paint = Paint()
@@ -182,12 +186,14 @@ fun changeExposure(bitmap: Bitmap, exposure: Float): Bitmap {
 fun changeContrast(bitmap: Bitmap, contrast: Float): Bitmap {
     val adjustedBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
     val cm = ColorMatrix()
-    cm.set(floatArrayOf(
-        contrast, 0f, 0f, 0f, 0f,
-        0f, contrast, 0f, 0f, 0f,
-        0f, 0f, contrast, 0f, 0f,
-        0f, 0f, 0f, 1f, 0f
-    ))
+    cm.set(
+        floatArrayOf(
+            contrast, 0f, 0f, 0f, 0f,
+            0f, contrast, 0f, 0f, 0f,
+            0f, 0f, contrast, 0f, 0f,
+            0f, 0f, 0f, 1f, 0f
+        )
+    )
     val cf = ColorMatrixColorFilter(cm)
     val paint = Paint()
     paint.colorFilter = cf
@@ -197,13 +203,13 @@ fun changeContrast(bitmap: Bitmap, contrast: Float): Bitmap {
 }
 
 @SuppressLint("DefaultLocale")
-fun textTintFormat(value : Float): String {
+fun textTintFormat(value: Float): String {
     var formatted = if (value == value.toLong().toFloat()) {
         String.format("%.0f", value)
     } else {
         String.format("%.2f", value)
     }
-    if (formatted == "-0.00" || formatted == "0.00"){
+    if (formatted == "-0.00" || formatted == "0.00") {
         formatted = "0"
     }
     return formatted
