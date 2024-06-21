@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TimerExposureViewModel @Inject constructor() : ViewModel() {
     var mainFrameVisible by mutableStateOf(true)
-    val maxTime = mutableStateOf(60_000L)
+    val maxTime = mutableStateOf(30L)
     val timeLeft = mutableStateOf(maxTime.value)
     val timeSpent = mutableStateOf(0)
     val progress = mutableStateOf(1f)

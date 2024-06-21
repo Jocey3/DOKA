@@ -1,6 +1,5 @@
 package com.doka
 
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
@@ -24,7 +23,6 @@ import com.doka.ui.screens.splash.SplashScreen
 import com.doka.ui.screens.timer_developer.TimerDeveloperScreen
 import com.doka.ui.screens.timer_exposure.TimerExposureScreen
 import com.doka.ui.screens.timer_fixer.TimerFixerScreen
-import com.doka.util.negative
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -47,10 +45,16 @@ fun NavigationComponent(
         navController = navController,
         startDestination = NavTarget.Splash.label,
         enterTransition = {
-            fadeIn(animationSpec = tween(500))
+            fadeIn()
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(500))
+            fadeOut()
+        },
+        popEnterTransition = {
+            fadeIn()
+        },
+        popExitTransition = {
+            fadeOut()
         }
     ) {
         composable(NavTarget.Splash.label) {

@@ -24,13 +24,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
@@ -44,12 +42,10 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
+import com.doka.ui.screens.timer_exposure.TimerExposureViewModel
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
-import com.doka.ui.theme.DarkTextColor
-import com.doka.ui.theme.RedClick
 import com.doka.ui.theme.RudeDark
-import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
 
@@ -159,21 +155,12 @@ fun BottomPanel(
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun Timer(modifier: Modifier = Modifier, viewModel: TimerDeveloperViewModel = hiltViewModel()) {
+fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hiltViewModel()) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LinearProgressIndicator(
-            progress = { viewModel.progress.value },
-            color = RudeLight,
-            trackColor = if (viewModel.timeLeft.value <= 0) RedClick else ButtonBackgroundColor,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .clip(RoundedCornerShape(40.dp))
-        )
         AnimatedContent(
             targetState = viewModel.timeLeft.value,
             transitionSpec = {
@@ -193,13 +180,13 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerDeveloperViewModel = hi
                     // be displayed out of bounds.
                     SizeTransform(clip = false)
                 )
-            }
+            }, label = "Timer"
         ) { targetCount ->
             Text(
                 text = String.format("%d", targetCount),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = DarkTextColor
+                color = ButtonBackgroundColor
             )
         }
     }

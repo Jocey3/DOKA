@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.media.MediaPlayer
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -61,9 +58,8 @@ import com.doka.R
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.DarkTextColor
-import com.doka.ui.theme.RedClick
+import com.doka.ui.theme.ImageFrameBottomPadding
 import com.doka.ui.theme.RudeDark
-import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
 
@@ -113,6 +109,7 @@ fun TimerExposureScreen(
                     .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
+            Spacer(modifier = Modifier.height(ImageFrameBottomPadding))
         }
         Box(
             modifier = Modifier
@@ -164,7 +161,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
             .size(width = 179.dp, height = 127.dp)
             .padding(2.dp)
     ) {
-        sharedVM.currentBitmap?.let {
+        val image = remember { sharedVM.currentBitmap }
+
+        image?.let {
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
@@ -175,7 +174,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                         rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
             )
         } ?: run {
 
@@ -185,7 +184,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                     .fillMaxWidth()
                     .fillMaxHeight(),
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
 
             )
         }
@@ -258,7 +257,6 @@ fun BottomPanel(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hiltViewModel()) {
@@ -267,15 +265,6 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LinearProgressIndicator(
-            progress = { viewModel.progress.value },
-            color = RudeLight,
-            trackColor = if (viewModel.timeLeft.value <= 0) RedClick else ButtonBackgroundColor,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .clip(RoundedCornerShape(40.dp))
-        )
         AnimatedContent(
             targetState = viewModel.timeLeft.value,
             transitionSpec = {
@@ -295,13 +284,13 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
                     // be displayed out of bounds.
                     SizeTransform(clip = false)
                 )
-            }
+            }, label = "Timer"
         ) { targetCount ->
             Text(
                 text = String.format("%d", targetCount),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = DarkTextColor
+                color = ButtonBackgroundColor
             )
         }
     }

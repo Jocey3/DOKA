@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,6 +49,7 @@ import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
+import com.doka.ui.theme.ImageFrameBottomPadding
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
@@ -90,6 +92,7 @@ fun ContrastScreen(
                     .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
+            Spacer(modifier = Modifier.height(ImageFrameBottomPadding))
         }
 
         Box(
@@ -143,7 +146,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                         rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
             )
         } ?: run {
 
@@ -153,7 +156,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                     .fillMaxWidth()
                     .fillMaxHeight(),
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
 
             )
         }

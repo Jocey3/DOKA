@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,14 +21,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.addOutline
@@ -51,6 +50,7 @@ import com.doka.ImageSettings
 import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.DOKATheme
+import com.doka.ui.theme.ImageFrameBottomPadding
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeLight
 import com.doka.ui.theme.RudeMid
@@ -93,6 +93,7 @@ fun EditScreen(
                     .size(width = 330.dp, height = 220.dp),
                 sharedVM = sharedVM
             )
+            Spacer(modifier = Modifier.height(ImageFrameBottomPadding))
         }
 
         Box(
@@ -173,7 +174,7 @@ fun FrameWithImage(
                         rotationZ = viewModel.angle.value
                     },
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
             )
         } ?: run {
 
@@ -183,7 +184,7 @@ fun FrameWithImage(
                     .fillMaxWidth()
                     .fillMaxHeight(),
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.FillBounds
 
             )
         }

@@ -100,12 +100,7 @@ fun BottomPanel(
             .padding(vertical = 16.dp, horizontal = 30.dp)
     ) {
         Row() {
-            Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.svg_arrow_back_up),
-                contentDescription = "Button back",
-                modifier = Modifier
-                    .clickable { navigateBack() }
-            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
 
         Spacer(modifier = Modifier.height(24.dp))
