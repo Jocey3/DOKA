@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -49,7 +48,6 @@ import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
-import com.doka.ui.theme.ImageFrameBottomPadding
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
@@ -79,22 +77,16 @@ fun TintScreen(
             modifier = Modifier
                 .constrainAs(mainFrame) {
                     top.linkTo(parent.top)
-                    bottom.linkTo(bottomPanel.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-
-                    // Adding vertical bias to center mainFrame in the available space
-                    top.linkTo(parent.top)
-                    bottom.linkTo(bottomPanel.top)
-                    verticalChainWeight = 0.5f
                 }
+                .padding(top = 32.dp)
         ) {
             MainFrame(
                 modifier = Modifier
                     .size(width = 330.dp, height = 220.dp),
                 sharedVM
             )
-            Spacer(modifier = Modifier.height(ImageFrameBottomPadding))
         }
 
         Box(

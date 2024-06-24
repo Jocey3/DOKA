@@ -39,7 +39,6 @@ import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.FrameInnerColor
-import com.doka.ui.theme.ImageFrameBottomPadding
 import com.doka.ui.theme.RedText
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
@@ -66,21 +65,15 @@ fun ExposureScreen(
             modifier = Modifier
                 .constrainAs(mainFrame) {
                     top.linkTo(parent.top)
-                    bottom.linkTo(bottomPanel.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-
-                    // Adding vertical bias to center mainFrame in the available space
-                    top.linkTo(parent.top)
-                    bottom.linkTo(bottomPanel.top)
-                    verticalChainWeight = 0.5f
                 }
+                .padding(top = 32.dp)
         ) {
             MainFrame(
                 modifier = Modifier
                     .size(width = 330.dp, height = 220.dp), sharedVM
             )
-            Spacer(modifier = Modifier.height(ImageFrameBottomPadding))
         }
         Box(
             modifier = Modifier

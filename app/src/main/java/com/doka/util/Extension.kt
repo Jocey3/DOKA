@@ -43,7 +43,7 @@ fun ResponseBody.getBitmap(): Bitmap {
 }
 
 fun Bitmap.adjustedImage(): Bitmap {
-    return flippedHorizontally().flippedVertically().noir()
+    return flippedHorizontally().noir()
 }
 
 fun Bitmap.flippedHorizontally(): Bitmap {
