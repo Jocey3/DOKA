@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,7 +67,8 @@ fun SettingsScreen(
                 navigateExposure = navigateExposure,
                 navigateSaturation = navigateSaturation,
                 navigateContrast = navigateContrast,
-                navigateTint = navigateTint)
+                navigateTint = navigateTint
+            )
         }
     }
 }
@@ -83,13 +83,15 @@ fun BottomPanel(
     navigateTint: () -> Unit,
     navigateBack: () -> Unit = {}
 ) {
-    val buttonList = remember {listOf(
-        ButtonModel("Exp. timer", R.drawable.svg_timer),
-        ButtonModel("Exposure", R.drawable.svg_exposure),
-        ButtonModel("Saturation", R.drawable.svg_saturation),
-        ButtonModel("Contrast", R.drawable.svg_contrast),
-        ButtonModel("Tint", R.drawable.svg_tint)
-    )}
+    val buttonList = remember {
+        listOf(
+            ButtonModel("Exp. timer", R.drawable.svg_timer),
+            ButtonModel("Exposure", R.drawable.svg_exposure),
+            ButtonModel("Saturation", R.drawable.svg_saturation),
+            ButtonModel("Contrast", R.drawable.svg_contrast),
+            ButtonModel("Tint", R.drawable.svg_tint)
+        )
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -99,14 +101,19 @@ fun BottomPanel(
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
     ) {
-        Row() {
-            Spacer(modifier = Modifier.height(32.dp))
+        Row {
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
+                contentDescription = "Button OK",
+                modifier = Modifier
+                    .clickable { navigateBack() }
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
-        LazyRow(modifier = Modifier.fillMaxSize()) {
-            itemsIndexed(buttonList) { index, item ->
+        LazyRow {
+            itemsIndexed(buttonList) { index, _ ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -120,13 +127,11 @@ fun BottomPanel(
                         }
                 ) {
                     Image(
-                        modifier = Modifier.height(IntrinsicSize.Min),
                         imageVector = ImageVector.vectorResource(id = buttonList[index].image),
                         contentDescription = buttonList[index].title,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        modifier = Modifier.weight(1f),
                         text = buttonList[index].title,
                         fontSize = 14.sp,
                         maxLines = 1,
@@ -137,12 +142,16 @@ fun BottomPanel(
 
             }
         }
+        Spacer(modifier = Modifier.height(15.dp))
     }
 }
 
 data class ButtonModel(val title: String, val image: Int)
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    showBackground = true, showSystemUi = true,
+    device = "spec:width=411dp,height=711dp,dpi=420"
+)
 @Composable
 fun GreetingPreview() {
     DOKATheme {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,40 +71,46 @@ fun TintScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RudeDark)
+            .systemBarsPadding()
+            .padding(top = 32.dp)
     ) {
-        val (mainFrame, bottomPanel) = createRefs()
+        val (mainFrame, middle, bottomPanel) = createRefs()
 
-        Box(
+        Spacer(modifier = Modifier
+            .size(1.dp)
+            .constrainAs(middle) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(bottomPanel.top)
+            })
+
+        MainFrame(
             modifier = Modifier
                 .constrainAs(mainFrame) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
+                    bottom.linkTo(middle.top)
+                    height = Dimension.fillToConstraints
+                    width = Dimension.fillToConstraints
                 }
-                .padding(top = 32.dp)
-        ) {
-            MainFrame(
-                modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp),
-                sharedVM
-            )
-        }
+                .padding(horizontal = 16.dp),
+            sharedVM = sharedVM
+        )
 
-        Box(
+        BottomPanel(
             modifier = Modifier
                 .constrainAs(bottomPanel) {
                     bottom.linkTo(parent.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     height = Dimension.percent(0.25f) // Set height to 1/4 of the screen
-                }
-        ) {
-            BottomPanel(
-                sharedVM = sharedVM,
-                navigateNext = navigateNext,
-                navigateBack = navigateBack
-            )
-        }
+                },
+            sharedVM = sharedVM,
+            navigateNext = navigateNext,
+            navigateBack = navigateBack
+        )
     }
 }
 
@@ -130,6 +137,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
             .padding(2.dp)
     ) {
         sharedVM.currentBitmap?.let {
+            val isVertical = it.width < it.height
+            val contentScale = if (isVertical) ContentScale.Fit else ContentScale.FillBounds
+
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
@@ -140,10 +150,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                         rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.FillBounds
+                contentScale = contentScale
             )
         } ?: run {
-
             Image(
                 painter = ColorPainter(Color.Green),
                 modifier = Modifier

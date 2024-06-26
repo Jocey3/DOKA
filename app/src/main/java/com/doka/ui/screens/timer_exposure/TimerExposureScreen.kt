@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,37 +87,45 @@ fun TimerExposureScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RudeDark)
+            .systemBarsPadding()
+            .padding(top = 32.dp)
     ) {
-        val (mainFrame, bottomPanel) = createRefs()
-        Box(
+        val (mainFrame, middle, bottomPanel) = createRefs()
+
+        Spacer(modifier = Modifier
+            .size(1.dp)
+            .constrainAs(middle) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(bottomPanel.top)
+            })
+
+        MainFrame(
             modifier = Modifier
                 .constrainAs(mainFrame) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
+                    bottom.linkTo(middle.top)
+                    height = Dimension.fillToConstraints
+                    width = Dimension.fillToConstraints
                 }
-                .padding(top = 32.dp)
-        ) {
-            MainFrame(
-                modifier = Modifier
-                    .size(width = 330.dp, height = 220.dp),
-                sharedVM
-            )
-        }
-        Box(
+                .padding(horizontal = 16.dp),
+            sharedVM = sharedVM
+        )
+
+        BottomPanel(
             modifier = Modifier
                 .constrainAs(bottomPanel) {
                     bottom.linkTo(parent.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     height = Dimension.percent(0.25f) // Set height to 1/4 of the screen
-                }
-        ) {
-            BottomPanel(
-                navigateNext = navigateNext,
-                navigateBack = navigateBack
-            )
-        }
+                },
+            navigateNext = navigateNext,
+            navigateBack = navigateBack
+        )
 
     }
 
@@ -156,6 +165,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
         val image = remember { sharedVM.currentBitmap }
 
         image?.let {
+            val isVertical = it.width < it.height
+            val contentScale = if (isVertical) ContentScale.Fit else ContentScale.FillBounds
+
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
@@ -166,10 +178,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                         rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
-                contentScale = ContentScale.FillBounds
+                contentScale = contentScale
             )
         } ?: run {
-
             Image(
                 painter = ColorPainter(Color.Green),
                 modifier = Modifier
@@ -279,7 +290,10 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
             }, label = "Timer"
         ) { targetCount ->
             Text(
-                text = String.format("%d", targetCount),
+                text = if (targetCount > 30) String.format(
+                    "%d",
+                    targetCount / 1000
+                ) else String.format("%d", targetCount),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = ButtonBackgroundColor

@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimerDeveloperViewModel @Inject constructor() : ViewModel() {
-    val maxTime = mutableStateOf(30L)
+    val maxTime = mutableStateOf(30_000L)
     val timeLeft = mutableStateOf(maxTime.value)
     val timeSpent = mutableStateOf(0)
     val progress = mutableStateOf(1f)
@@ -23,12 +23,8 @@ class TimerDeveloperViewModel @Inject constructor() : ViewModel() {
     var mediaPlayer: MediaPlayer? = null
 
     private var timerJob: Job? = null
+    private var soundJob: Job? = null
     private val interval = 100L
-
-    init {
-        loadProgress()
-    }
-
 
     fun loadProgress() {
         timerJob?.cancel()
@@ -40,12 +36,12 @@ class TimerDeveloperViewModel @Inject constructor() : ViewModel() {
                 timeLeft.value = (maxTime.value - timeSpent.value) / 1000
                 progress.value = 1f - (timeSpent.value.toFloat() / maxTime.value.toFloat())
             }
-            playBeeps()
+            if (soundJob == null) playBeeps()
         }
     }
 
     private fun playBeeps() {
-        viewModelScope.launch(Dispatchers.Default) {
+        soundJob = viewModelScope.launch(Dispatchers.Default) {
             repeat(3) {
                 async {
                     mediaPlayer?.start()
@@ -74,6 +70,7 @@ class TimerDeveloperViewModel @Inject constructor() : ViewModel() {
 
     override fun onCleared() {
         timerJob?.cancel()
+        soundJob?.cancel()
         mediaPlayer?.release()
         mediaPlayer = null
         super.onCleared()

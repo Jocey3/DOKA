@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +43,6 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.doka.MainViewModel
 import com.doka.R
-import com.doka.ui.screens.timer_exposure.TimerExposureViewModel
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RudeDark
@@ -61,6 +61,11 @@ fun TimerDeveloperScreen(
     val context = LocalContext.current
     viewModel.mediaPlayer = remember { MediaPlayer.create(context, R.raw.beep_sound) }
     viewModel.navigateNext = remember { navigateNext }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadProgress()
+    }
+
     BackHandler {
         navigateBack()
     }
@@ -155,7 +160,7 @@ fun BottomPanel(
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hiltViewModel()) {
+fun Timer(modifier: Modifier = Modifier, viewModel: TimerDeveloperViewModel = hiltViewModel()) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -183,7 +188,10 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
             }, label = "Timer"
         ) { targetCount ->
             Text(
-                text = String.format("%d", targetCount),
+                text = if (targetCount > 30) String.format(
+                    "%d",
+                    targetCount / 1000
+                ) else String.format("%d", targetCount),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = ButtonBackgroundColor

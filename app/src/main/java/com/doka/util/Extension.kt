@@ -2,10 +2,6 @@ package com.doka.util
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.content.Context.AUDIO_SERVICE
 import android.graphics.Bitmap
 import android.graphics.Bitmap.Config
 import android.graphics.BitmapFactory
@@ -17,22 +13,12 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import android.media.AudioManager
-import android.os.Build
 import android.view.WindowManager
 import okhttp3.ResponseBody
 import java.io.ByteArrayOutputStream
 
 
 fun Activity.setAppSettings() {
-    val am = getSystemService(AUDIO_SERVICE) as AudioManager
-
-    am.setStreamVolume(
-        AudioManager.STREAM_MUSIC,
-        am.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
-        0
-    )
-
     val lp = window.attributes
     lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
     window.attributes = lp
