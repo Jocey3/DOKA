@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimerDeveloperViewModel @Inject constructor() : ViewModel() {
-    val maxTime = mutableStateOf(30_000L)
+    val maxTime = mutableStateOf(60_000L)
     val timeLeft = mutableStateOf(maxTime.value)
     val timeSpent = mutableStateOf(0)
     val progress = mutableStateOf(1f)
