@@ -10,16 +10,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
@@ -33,7 +31,6 @@ import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -70,8 +67,6 @@ fun EditScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RudeDark)
-            .systemBarsPadding()
-            .padding(top = 32.dp)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
 
@@ -94,7 +89,8 @@ fun EditScreen(
                     height = Dimension.fillToConstraints
                     width = Dimension.fillToConstraints
                 }
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(top = 32.dp),
             sharedVM = sharedVM
         )
 
@@ -123,31 +119,47 @@ fun MainFrame(
         modifier = modifier
             .clipToBounds()
     ) {
-        val parentWidthPx = constraints.maxWidth
-        val parentHeightPx = constraints.maxHeight
+        val density = LocalDensity.current
+        LaunchedEffect(Unit) {
+            viewModel.setFrameSize(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
 
-        val imageWidth = 179.dp
-        val imageHeight = 127.dp
-        val imageWidthPx = with(LocalDensity.current) { imageWidth.toPx() }
-        val imageHeightPx = with(LocalDensity.current) { imageHeight.toPx() }
+            val imageFrameWidth = constraints.maxWidth * 0.7f
+            val imageFrameHeight = constraints.maxHeight * 0.7f
+            val imageFrameWidthDp: Dp = with(density) { imageFrameWidth.toDp() }
+            val imageFrameHeightDp: Dp = with(density) { imageFrameHeight.toDp() }
 
-        val startX = ((parentWidthPx - imageWidthPx) / 2)
-        val startY = ((parentHeightPx - imageHeightPx) / 2)
+            viewModel.setImageFrameSize(
+                imageFrameWidth,
+                imageFrameHeight,
+                imageFrameWidthDp,
+                imageFrameHeightDp
+            )
 
-        viewModel.boxWidth.floatValue = parentWidthPx.toFloat()
-        viewModel.boxHeight.floatValue = parentHeightPx.toFloat()
-        viewModel.imageWidth.floatValue = imageWidthPx
-        viewModel.imageHeight.floatValue = imageHeightPx
+            sharedVM.currentBitmap?.let {
+                viewModel.setRealImageSize(it.width, it.height, density)
+            }
+            viewModel.realImageSize.value?.let {
+                val startX = ((constraints.maxWidth - it.width) / 2)
+                val startY = ((constraints.maxHeight - it.height) / 2)
 
-        if (viewModel.offset.value == null) viewModel.updateOffset(Offset(startX, startY))
+                if (viewModel.offset.value == null) viewModel.updateOffset(Offset(startX, startY))
+            }
+        }
+        viewModel.realImageSize.value?.let { realImageSize ->
+            realImageSize.widthDp?.let { widthDp ->
+                realImageSize.heightDp?.let { heightDp ->
+                    FrameWithImage(
+                        modifier = Modifier
+                            .size(width = widthDp, height = heightDp)
+                            .offset {
+                                viewModel.offset.value?.round() ?: Offset(0f, 0f).round()
+                            }, sharedVM
 
-        FrameWithImage(
-            modifier = Modifier
-                .offset {
-                    viewModel.offset.value!!.round()
-                }, sharedVM
+                    )
+                }
+            }
 
-        )
+        }
     }
 }
 
@@ -157,15 +169,8 @@ fun FrameWithImage(
     sharedVM: MainViewModel,
     viewModel: EditViewModel = hiltViewModel()
 ) {
-    Box(
-        modifier = modifier
-            .size(width = 179.dp, height = 127.dp)
-            .padding(2.dp)
-    ) {
+    Box(modifier = modifier) {
         sharedVM.currentBitmap?.let {
-            val isVertical = it.width < it.height
-            val contentScale = if (isVertical) ContentScale.Fit else ContentScale.FillBounds
-
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
@@ -176,20 +181,9 @@ fun FrameWithImage(
                         rotationZ = viewModel.angle.value
                     },
                 contentDescription = "Image for edit",
-                contentScale = contentScale
-            )
-        } ?: run {
-            Image(
-                painter = ColorPainter(Color.Green),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                contentDescription = "Image for edit",
-                contentScale = ContentScale.FillBounds
-
+                contentScale = ContentScale.Fit
             )
         }
-
     }
 }
 
@@ -233,6 +227,7 @@ fun BottomPanel(
                         viewModel.offset.value!!.x,
                         viewModel.offset.value!!.y
                     )
+                    sharedVM.imageSizeDp = viewModel.realImageSize.value
                     navigateNext()
                 }
         )
@@ -255,7 +250,7 @@ fun TouchPanel(
             )
             .pointerInput(Unit) {
                 detectTransformGestures(
-                    onGesture = { gestureCentroid, gesturePan, gestureZoom, gestureRotate ->
+                    onGesture = { _, gesturePan, gestureZoom, gestureRotate ->
                         val oldScale = viewModel.zoom.value
                         val newScale =
                             (viewModel.zoom.value * gestureZoom).coerceIn(0.5f..5f)

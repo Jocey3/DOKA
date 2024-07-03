@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,8 +68,6 @@ fun ContrastScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RudeDark)
-            .systemBarsPadding()
-            .padding(top = 32.dp)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
 
@@ -93,7 +90,8 @@ fun ContrastScreen(
                     height = Dimension.fillToConstraints
                     width = Dimension.fillToConstraints
                 }
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(top = 32.dp),
             sharedVM = sharedVM
         )
 
@@ -118,26 +116,26 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
         modifier = modifier
             .clipToBounds()
     ) {
-        FrameWithImage(modifier = Modifier.offset {
-            Offset(
-                sharedVM.savedImagesSettings.value.offsetX,
-                sharedVM.savedImagesSettings.value.offsetY
-            ).round()
-        }, sharedVM = sharedVM)
+        FrameWithImage(
+            modifier = Modifier
+                .size(
+                    width = sharedVM.imageSizeDp?.widthDp!!,
+                    height = sharedVM.imageSizeDp?.heightDp!!
+                )
+                .offset {
+                    Offset(
+                        sharedVM.savedImagesSettings.value.offsetX,
+                        sharedVM.savedImagesSettings.value.offsetY
+                    ).round()
+                }, sharedVM = sharedVM
+        )
     }
 }
 
 @Composable
 fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    Box(
-        modifier = modifier
-            .size(width = 179.dp, height = 127.dp)
-            .padding(2.dp)
-    ) {
+    Box(modifier = modifier) {
         sharedVM.currentBitmap?.let {
-            val isVertical = it.width < it.height
-            val contentScale = if (isVertical) ContentScale.Fit else ContentScale.FillBounds
-
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
@@ -148,7 +146,7 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                         rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
-                contentScale = contentScale
+                contentScale = ContentScale.Fit
             )
         } ?: run {
             Image(

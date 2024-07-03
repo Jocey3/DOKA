@@ -9,13 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,10 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
@@ -71,8 +66,6 @@ fun ExposureTimerSettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RudeDark)
-            .systemBarsPadding()
-            .padding(top = 32.dp)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
 
@@ -95,7 +88,8 @@ fun ExposureTimerSettingsScreen(
                     height = Dimension.fillToConstraints
                     width = Dimension.fillToConstraints
                 }
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(top = 32.dp),
             sharedVM = sharedVM
         )
 
@@ -126,6 +120,10 @@ fun MainFrame(
     ) {
         FrameWithImage(
             modifier = Modifier
+                .size(
+                    width = sharedVM.imageSizeDp?.widthDp!!,
+                    height = sharedVM.imageSizeDp?.heightDp!!
+                )
                 .offset {
                     Offset(
                         sharedVM.savedImagesSettings.value.offsetX,
@@ -138,15 +136,8 @@ fun MainFrame(
 
 @Composable
 fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    Box(
-        modifier = modifier
-            .size(width = 179.dp, height = 127.dp)
-            .padding(2.dp)
-    ) {
+    Box(modifier = modifier) {
         sharedVM.currentBitmap?.let {
-            val isVertical = it.width < it.height
-            val contentScale = if (isVertical) ContentScale.Fit else ContentScale.FillBounds
-
             Image(
                 bitmap = it.asImageBitmap(),
                 modifier = Modifier
@@ -157,20 +148,9 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                         rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
-                contentScale = contentScale
-            )
-        } ?: run {
-            Image(
-                painter = ColorPainter(Color.Green),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                contentDescription = "Image for edit",
-                contentScale = ContentScale.FillBounds
-
+                contentScale = ContentScale.Fit
             )
         }
-
     }
 }
 

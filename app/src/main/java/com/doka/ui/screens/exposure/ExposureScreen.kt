@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,14 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -45,6 +45,7 @@ import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.util.ButtonDefault
 import com.doka.util.negative
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -60,8 +61,6 @@ fun ExposureScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(RudeDark)
-            .systemBarsPadding()
-            .padding(top = 32.dp)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
 
@@ -84,7 +83,8 @@ fun ExposureScreen(
                     height = Dimension.fillToConstraints
                     width = Dimension.fillToConstraints
                 }
-                .padding(horizontal = 16.dp), sharedVM
+                .padding(horizontal = 16.dp)
+                .padding(top = 32.dp), sharedVM
         )
 
         BottomPanel(
@@ -104,34 +104,44 @@ fun ExposureScreen(
 
 @Composable
 fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .clipToBounds()
-            .offset {
-                Offset(
-                    sharedVM.savedImagesSettings.value.offsetX,
-                    sharedVM.savedImagesSettings.value.offsetY
-                ).round()
-            }
     ) {
+        val width = with(LocalDensity.current) { 179.dp.toPx() }
+        val height = with(LocalDensity.current) { 127.dp.toPx() }
+
+        val offsetXRange = 0f..(constraints.maxWidth.toFloat() - width)
+        val offsetYRange = 0f..(constraints.maxHeight.toFloat() - height)
 
         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(width = 179.dp, height = 127.dp)
-                .background(FrameInnerColor)
-                .padding(2.dp)
-                .clip(RectangleShape)
-        ) {
-            Text(
-                text = "Place photo paper here",
-                fontSize = 20.sp,
-                color = RedText,
-                textAlign = TextAlign.Center,
+            modifier = Modifier.offset {
+                val offsetX = sharedVM.savedImagesSettings.value.offsetX.coerceIn(offsetXRange)
+                val offsetY = sharedVM.savedImagesSettings.value.offsetY.coerceIn(offsetYRange)
+                IntOffset(offsetX.roundToInt(), offsetY.roundToInt())
+            }) {
+
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .padding(vertical = 30.dp, horizontal = 20.dp)
-                    .rotate(180f)
-            )
+                    .size(
+                        width = 179.dp,
+                        height = 127.dp
+                    )
+                    .background(FrameInnerColor)
+                    .padding(2.dp)
+                    .clip(RectangleShape)
+            ) {
+                Text(
+                    text = "Place photo paper here",
+                    fontSize = 20.sp,
+                    color = RedText,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(vertical = 30.dp, horizontal = 20.dp)
+                        .rotate(180f)
+                )
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.doka.ui.screens.edit.Size
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -12,6 +13,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     var beforeExposure: Bitmap? = null
     var currentBitmap: Bitmap? = null
     var changedBitmap: Bitmap? = null
+    var imageSizeDp: Size? = null
     val savedImagesSettings = mutableStateOf(ImageSettings(0f, 0f, 0f, 0f))
     val exposure = mutableFloatStateOf(1f)
     val saturation = mutableFloatStateOf(1f)
@@ -23,6 +25,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
         setSettingsDefault()
         beforeExposure = null
         currentBitmap = null
+        imageSizeDp=null
         savedImagesSettings.value = ImageSettings(0f, 0f, 0f, 0f)
     }
 
