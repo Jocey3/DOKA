@@ -25,7 +25,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
         setSettingsDefault()
         beforeExposure = null
         currentBitmap = null
-        imageSizeDp=null
+        imageSizeDp = null
         savedImagesSettings.value = ImageSettings(0f, 0f, 0f, 0f)
     }
 

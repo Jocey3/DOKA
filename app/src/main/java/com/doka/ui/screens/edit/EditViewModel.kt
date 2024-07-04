@@ -55,10 +55,10 @@ class EditViewModel @Inject constructor() : ViewModel() {
 
     fun updateOffset(newOffset: Offset) {
         frameSize.value?.let { frameSizeValue ->
-            realImageSize.value?.let { imageSizeValue ->
+            realImageSize.value?.let { realImageSize ->
                 _offset.value = Offset(
-                    x = newOffset.x.coerceIn(0f, frameSizeValue.width - imageSizeValue.width),
-                    y = newOffset.y.coerceIn(0f, frameSizeValue.height - imageSizeValue.height)
+                    x = newOffset.x.coerceIn(0f, frameSizeValue.width - realImageSize.width),
+                    y = newOffset.y.coerceIn(0f, frameSizeValue.height - realImageSize.height)
                 )
             }
         }

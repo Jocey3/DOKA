@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,11 +107,11 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
         modifier = modifier
             .clipToBounds()
     ) {
-        val width = with(LocalDensity.current) { 179.dp.toPx() }
-        val height = with(LocalDensity.current) { 127.dp.toPx() }
+        val imageFrameWidth = constraints.maxWidth * 0.7f
+        val imageFrameHeight = constraints.maxHeight * 0.7f
 
-        val offsetXRange = 0f..(constraints.maxWidth.toFloat() - width)
-        val offsetYRange = 0f..(constraints.maxHeight.toFloat() - height)
+        val offsetXRange = 0f..(constraints.maxWidth.toFloat() - imageFrameWidth)
+        val offsetYRange = 0f..(constraints.maxHeight.toFloat() - imageFrameHeight)
 
         Box(
             modifier = Modifier.offset {
@@ -124,10 +123,7 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(
-                        width = 179.dp,
-                        height = 127.dp
-                    )
+                    .fillMaxSize(0.7f)
                     .background(FrameInnerColor)
                     .padding(2.dp)
                     .clip(RectangleShape)
