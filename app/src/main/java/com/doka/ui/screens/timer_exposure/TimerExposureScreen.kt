@@ -57,6 +57,7 @@ import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.ui.theme.TextSimpleColor
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -68,8 +69,10 @@ fun TimerExposureScreen(
     viewModel: TimerExposureViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    LaunchedEffect(sharedVM.timeForExposure.value) {
-        viewModel.maxTime.value = sharedVM.timeForExposure.value.toLong() * 1000L
+    LaunchedEffect(Unit) {
+        viewModel.timeLeft.value = sharedVM.timeForExposure.floatValue.toLong()
+        viewModel.maxTime.value = sharedVM.timeForExposure.floatValue.toLong() * 1000L
+        delay(130)
         viewModel.loadProgress()
     }
     viewModel.mediaPlayer = remember { MediaPlayer.create(context, R.raw.beep_sound) }
@@ -249,36 +252,35 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerExposureViewModel = hil
         modifier = Modifier
             .fillMaxSize()
     ) {
-        AnimatedContent(
-            targetState = viewModel.timeLeft.value,
-            transitionSpec = {
-                // Compare the incoming number with the previous number.
-                if (targetState > initialState) {
-                    // If the target number is larger, it slides up and fades in
-                    // while the initial (smaller) number slides up and fades out.
-                    (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                        slideOutVertically { height -> -height } + fadeOut())
-                } else {
-                    // If the target number is smaller, it slides down and fades in
-                    // while the initial number slides down and fades out.
-                    (slideInVertically { height -> -height } + fadeIn()).togetherWith(
-                        slideOutVertically { height -> height } + fadeOut())
-                }.using(
-                    // Disable clipping since the faded slide-in/out should
-                    // be displayed out of bounds.
-                    SizeTransform(clip = false)
+        viewModel.timeLeft.value?.let {
+            AnimatedContent(
+                targetState = it,
+                transitionSpec = {
+                    // Compare the incoming number with the previous number.
+                    if (targetState > initialState) {
+                        // If the target number is larger, it slides up and fades in
+                        // while the initial (smaller) number slides up and fades out.
+                        (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                            slideOutVertically { height -> -height } + fadeOut())
+                    } else {
+                        // If the target number is smaller, it slides down and fades in
+                        // while the initial number slides down and fades out.
+                        (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                            slideOutVertically { height -> height } + fadeOut())
+                    }.using(
+                        // Disable clipping since the faded slide-in/out should
+                        // be displayed out of bounds.
+                        SizeTransform(clip = false)
+                    )
+                }, label = "Timer"
+            ) { targetCount ->
+                Text(
+                    if (targetCount > 90) (targetCount / 1000).toString() else targetCount.toString(),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = ButtonBackgroundColor
                 )
-            }, label = "Timer"
-        ) { targetCount ->
-            Text(
-                text = if (targetCount > 30) String.format(
-                    "%d",
-                    targetCount / 1000
-                ) else String.format("%d", targetCount),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = ButtonBackgroundColor
-            )
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.doka.ui.screens.timer_exposure
 
 import android.media.MediaPlayer
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,8 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TimerExposureViewModel @Inject constructor() : ViewModel() {
     var mainFrameVisible by mutableStateOf(true)
-    val maxTime = mutableStateOf(30L)
-    val timeLeft = mutableStateOf(maxTime.value)
+    val maxTime: MutableState<Long?> = mutableStateOf(null)
+    val timeLeft: MutableState<Long?> = mutableStateOf(null)
     val timeSpent = mutableStateOf(0)
     val progress = mutableStateOf(1f)
     val paused = mutableStateOf(false)
@@ -33,15 +34,18 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     fun loadProgress() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            for (i in (maxTime.value - timeSpent.value) downTo 0 step interval) {
-                if (paused.value) return@launch
-                delay(interval)
-                timeSpent.value += interval.toInt()
-                timeLeft.value = (maxTime.value - timeSpent.value) / 1000
-                progress.value = 1f - (timeSpent.value.toFloat() / maxTime.value.toFloat())
+            maxTime.value?.let { maxTime ->
+                for (i in (maxTime - timeSpent.value) downTo 0 step interval) {
+                    if (paused.value) return@launch
+                    delay(interval)
+                    timeSpent.value += interval.toInt()
+                    timeLeft.value = (maxTime - timeSpent.value) / 1000
+                    progress.value = 1f - (timeSpent.value.toFloat() / maxTime.toFloat())
+                }
+                mainFrameVisible = false
+                if (soundJob == null) playBeeps()
             }
-            mainFrameVisible = false
-            if (soundJob == null) playBeeps()
+
         }
     }
 
@@ -65,14 +69,18 @@ class TimerExposureViewModel @Inject constructor() : ViewModel() {
     }
 
     fun pauseTimer() {
-        if (timeLeft.value > 0) mainFrameVisible = false
-        paused.value = true
+        timeLeft.value?.let {
+            if (it > 0) mainFrameVisible = false
+            paused.value = true
+        }
     }
 
     fun resumeTimer() {
-        if (timeLeft.value > 0) mainFrameVisible = true
-        paused.value = false
-        loadProgress()
+        timeLeft.value?.let {
+            if (it > 0) mainFrameVisible = true
+            paused.value = false
+            loadProgress()
+        }
     }
 
     override fun onCleared() {
