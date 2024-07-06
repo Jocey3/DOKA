@@ -1,5 +1,7 @@
 package com.doka
 
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
@@ -45,16 +47,16 @@ fun NavigationComponent(
         navController = navController,
         startDestination = NavTarget.Splash.label,
         enterTransition = {
-            fadeIn()
+            fadeIn(initialAlpha=0f,animationSpec=snap())
         },
         exitTransition = {
-            fadeOut()
+            fadeOut(targetAlpha=1f,animationSpec=snap())
         },
         popEnterTransition = {
-            fadeIn()
+            fadeIn(initialAlpha=0f,animationSpec=snap())
         },
         popExitTransition = {
-            fadeOut()
+            fadeOut(targetAlpha=1f,animationSpec=snap())
         }
     ) {
         composable(NavTarget.Splash.label) {

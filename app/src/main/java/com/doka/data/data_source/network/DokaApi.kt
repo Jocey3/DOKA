@@ -7,7 +7,7 @@ import retrofit2.http.Streaming
 
 interface DokaApi {
 
-    @GET("/picture")
+    @GET("/pictures")
     @Streaming
     suspend fun getPicture(): Response<ResponseBody>
 }
