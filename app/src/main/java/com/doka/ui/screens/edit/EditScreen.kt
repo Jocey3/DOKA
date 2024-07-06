@@ -227,7 +227,7 @@ fun BottomPanel(
                         viewModel.offset.value!!.x,
                         viewModel.offset.value!!.y
                     )
-                    sharedVM.imageSizeDp = viewModel.realImageSize.value
+                    sharedVM.imageSize = viewModel.realImageSize.value
                     navigateNext()
                 }
         )

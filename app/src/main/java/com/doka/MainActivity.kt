@@ -56,6 +56,14 @@ class MainActivity : ComponentActivity() {
         super.onStop()
     }
 
+    override fun onDestroy() {
+        // Disable Do Not Disturb mode
+        if (notificationManager.isNotificationPolicyAccessGranted) {
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL)
+        }
+        super.onDestroy()
+    }
+
     private fun showDNDSettingsPrompt() {
         AlertDialog.Builder(this)
             .setTitle("Configure Do Not Disturb Settings")

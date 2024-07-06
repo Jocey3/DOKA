@@ -117,8 +117,8 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
         FrameWithImage(
             modifier = Modifier
                 .size(
-                    width = sharedVM.imageSizeDp?.widthDp!!,
-                    height = sharedVM.imageSizeDp?.heightDp!!
+                    width = sharedVM.imageSize?.widthDp!!,
+                    height = sharedVM.imageSize?.heightDp!!
                 )
                 .offset {
                     Offset(
