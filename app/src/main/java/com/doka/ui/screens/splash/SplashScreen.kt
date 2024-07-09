@@ -1,7 +1,11 @@
 package com.doka.ui.screens.splash
 
 import android.app.Activity
+import android.graphics.BitmapFactory
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,13 +29,16 @@ import com.doka.ui.theme.DOKATheme
 import com.doka.ui.theme.RudeDark
 import com.doka.ui.theme.RudeMid
 import com.doka.util.ButtonDefault
+import com.doka.util.adjustedImage
+import java.io.IOException
 
 
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
     navigateNext: () -> Unit = {},
-    viewModel: MainViewModel = hiltViewModel(),
+    navigateEdit: () -> Unit = {},
+    sharedVM: MainViewModel = hiltViewModel()
 ) {
     val activity = LocalContext.current as? Activity
 
@@ -54,7 +61,11 @@ fun SplashScreen(
                     height = Dimension.percent(0.25f) // Set height to 1/4 of the screen
                 }
         ) {
-            BottomPanel { navigateNext() }
+            BottomPanel(
+                sharedVM = sharedVM,
+                navigateNext = navigateNext,
+                navigateEdit = navigateEdit
+            )
         }
 
     }
@@ -62,7 +73,35 @@ fun SplashScreen(
 }
 
 @Composable
-fun BottomPanel(modifier: Modifier = Modifier, navigateNext: () -> Unit = {}) {
+fun BottomPanel(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel = hiltViewModel(),
+    navigateNext: () -> Unit = {},
+    navigateEdit: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val pickMedia = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        try {
+            val inputStream = uri?.let { context.contentResolver?.openInputStream(it) }
+            if (inputStream != null) {
+                try {
+                    val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
+                    if (inputStream != null) {
+                        sharedVM.currentBitmap =
+                            BitmapFactory.decodeStream(inputStream).adjustedImage()
+                        navigateEdit.invoke()
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -78,6 +117,10 @@ fun BottomPanel(modifier: Modifier = Modifier, navigateNext: () -> Unit = {}) {
         Spacer(modifier = Modifier.weight(1f))
         ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Load image") {
             navigateNext()
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        ButtonDefault(text = "Select Photo") {
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
         Spacer(modifier = Modifier.weight(1f))
     }

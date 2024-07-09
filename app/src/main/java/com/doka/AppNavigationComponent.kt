@@ -61,7 +61,8 @@ fun NavigationComponent(
         composable(NavTarget.Splash.label) {
             SplashScreen(
                 navigateNext = { navigator.navigateTo(NavTarget.ImageSource) },
-                viewModel = sharedVM
+                navigateEdit = { navigator.navigateTo(NavTarget.Edit) },
+                sharedVM = sharedVM
             )
         }
         composable(NavTarget.ImageSource.label) {
