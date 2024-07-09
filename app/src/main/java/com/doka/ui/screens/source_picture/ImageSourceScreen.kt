@@ -102,29 +102,29 @@ fun BottomPanel(
     sharedVM: MainViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val pickMedia = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        try {
-            val inputStream = uri?.let { context.contentResolver?.openInputStream(it) }
-            if (inputStream != null) {
-                try {
-                    val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
-                    if (inputStream != null) {
-                        sharedVM.currentBitmap =
-                            BitmapFactory.decodeStream(inputStream).adjustedImage()
-                        navigateNext.invoke()
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
+//    val lifecycleOwner = LocalLifecycleOwner.current
+//
+//    val pickMedia = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.PickVisualMedia()
+//    ) { uri ->
+//        try {
+//            val inputStream = uri?.let { context.contentResolver?.openInputStream(it) }
+//            if (inputStream != null) {
+//                try {
+//                    val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
+//                    if (inputStream != null) {
+//                        sharedVM.currentBitmap =
+//                            BitmapFactory.decodeStream(inputStream).adjustedImage()
+//                        navigateNext.invoke()
+//                    }
+//                } catch (e: IOException) {
+//                    e.printStackTrace()
+//                }
+//            }
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//        }
+//    }
 
     LaunchedEffect(viewModel.state.message) {
         viewModel.state.message?.let {
@@ -145,9 +145,9 @@ fun BottomPanel(
             .padding(16.dp)
 
     ) {
-        ButtonDefault(text = "Select Photo") {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        }
+//        ButtonDefault(text = "Select Photo") {
+//            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+//        }
         if (viewModel.state.isLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier

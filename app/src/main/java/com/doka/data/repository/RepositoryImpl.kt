@@ -25,7 +25,7 @@ class RepositoryImpl @Inject constructor(
                     Resource.Error("Failed to decode bitmap")
                 }
             } else {
-                Resource.Error("Unexpected response code: ${response.code()}")
+                Resource.Error("Please upload some image")
             }
         }
     }
