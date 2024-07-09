@@ -8,12 +8,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.doka.domain.usecase.DeletePictureUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.min
 
 @HiltViewModel
-class EditViewModel @Inject constructor() : ViewModel() {
+class EditViewModel @Inject constructor(
+    private val deletePictureUseCase: DeletePictureUseCase
+) : ViewModel() {
     private val _frameSize: MutableState<Size?> = mutableStateOf(null)
     val frameSize: State<Size?> = _frameSize
 
@@ -31,6 +37,15 @@ class EditViewModel @Inject constructor() : ViewModel() {
 
     private val _angle = mutableFloatStateOf(0f)
     val angle: State<Float> = _angle
+
+    private val handlerException = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
+
+    init {
+        deletePicture()
+
+    }
 
     fun setFrameSize(width: Float, height: Float) {
         _frameSize.value = Size(width, height)
@@ -71,6 +86,13 @@ class EditViewModel @Inject constructor() : ViewModel() {
     fun updateAngle(newAngle: Float) {
         _angle.floatValue = newAngle
     }
+
+    private fun deletePicture() {
+        viewModelScope.launch(handlerException) {
+            deletePictureUseCase()
+        }
+    }
+
 }
 
 data class Size(

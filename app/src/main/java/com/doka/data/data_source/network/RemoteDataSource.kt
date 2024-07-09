@@ -11,4 +11,8 @@ class RemoteDataSource @Inject constructor(private val api: DokaApi) {
         return api.getPicture()
     }
 
+    suspend fun deletePicture(): Response<ResponseBody> {
+        return api.deletePicture()
+    }
+
 }

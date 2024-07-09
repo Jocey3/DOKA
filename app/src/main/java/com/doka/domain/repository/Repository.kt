@@ -5,4 +5,6 @@ import com.doka.util.Resource
 
 interface Repository {
     suspend fun getPicture(): Resource<Bitmap?>
+
+    suspend fun deletePicture()
 }

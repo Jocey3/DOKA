@@ -29,4 +29,10 @@ class RepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun deletePicture() {
+        return withContext(Dispatchers.IO) {
+            remoteDataSource.deletePicture()
+        }
+    }
 }
