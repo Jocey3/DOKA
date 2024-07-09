@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -19,15 +21,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.doka.MainViewModel
 import com.doka.R
 import com.doka.ui.theme.ButtonBackgroundColor
 import com.doka.ui.theme.DOKATheme
@@ -44,6 +53,7 @@ fun SettingsScreen(
     navigateSaturation: () -> Unit = {},
     navigateContrast: () -> Unit = {},
     navigateTint: () -> Unit = {},
+    sharedVM: MainViewModel = hiltViewModel(),
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     ConstraintLayout(
@@ -51,7 +61,31 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(RudeDark)
     ) {
-        val (bottomPanel) = createRefs()
+        val (mainFrame, middle, bottomPanel) = createRefs()
+        Spacer(modifier = Modifier
+            .size(1.dp)
+            .constrainAs(middle) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(bottomPanel.top)
+            })
+
+        MainFrame(
+            modifier = Modifier
+                .constrainAs(mainFrame) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(middle.top)
+                    height = Dimension.fillToConstraints
+                    width = Dimension.fillToConstraints
+                }
+                .padding(horizontal = 16.dp)
+                .padding(top = 32.dp),
+            sharedVM = sharedVM
+        )
+
         Box(
             modifier = Modifier
                 .constrainAs(bottomPanel) {
@@ -68,6 +102,54 @@ fun SettingsScreen(
                 navigateSaturation = navigateSaturation,
                 navigateContrast = navigateContrast,
                 navigateTint = navigateTint
+            )
+        }
+    }
+}
+
+@Composable
+fun MainFrame(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel
+) {
+    Box(
+        modifier = modifier
+            .clipToBounds()
+    ) {
+        FrameWithImage(
+            modifier = Modifier
+                .size(
+                    width = sharedVM.imageSize?.widthDp!!,
+                    height = sharedVM.imageSize?.heightDp!!
+                )
+                .offset {
+                    Offset(
+                        sharedVM.savedImagesSettings.value.offsetX,
+                        sharedVM.savedImagesSettings.value.offsetY
+                    ).round()
+                }, sharedVM = sharedVM
+        )
+    }
+}
+
+@Composable
+fun FrameWithImage(
+    modifier: Modifier = Modifier,
+    sharedVM: MainViewModel
+) {
+    Box(modifier = modifier) {
+        sharedVM.currentBitmap?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        scaleX = sharedVM.savedImagesSettings.value.zoom
+                        scaleY = sharedVM.savedImagesSettings.value.zoom
+                        rotationZ = sharedVM.savedImagesSettings.value.rotation
+                    },
+                contentDescription = "Image for edit",
+                contentScale = ContentScale.Fit
             )
         }
     }

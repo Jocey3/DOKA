@@ -72,7 +72,7 @@ fun TimerExposureScreen(
     LaunchedEffect(Unit) {
         viewModel.timeLeft.value = sharedVM.timeForExposure.floatValue.toLong()
         viewModel.maxTime.value = sharedVM.timeForExposure.floatValue.toLong() * 1000L
-        delay(130)
+        delay(1000)
         viewModel.loadProgress()
     }
     viewModel.mediaPlayer = remember { MediaPlayer.create(context, R.raw.beep_sound) }
