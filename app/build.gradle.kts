@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.doka"
+    namespace = "com.dokaLocal"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.doka"
+        applicationId = "com.dokaLocal"
         minSdk = 24
         targetSdk = 34
         versionCode = 6
