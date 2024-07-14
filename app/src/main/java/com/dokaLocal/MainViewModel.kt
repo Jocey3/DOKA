@@ -19,7 +19,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     val saturation = mutableFloatStateOf(1f)
     val contrast = mutableFloatStateOf(1f)
     val tint = mutableFloatStateOf(0f)
-    val timeForExposure = mutableFloatStateOf(30f)
+    val timeForExposure = mutableFloatStateOf(50f)
 
     fun clearData() {
         setSettingsDefault()

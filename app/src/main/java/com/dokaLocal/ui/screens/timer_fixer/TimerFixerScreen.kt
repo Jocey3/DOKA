@@ -188,7 +188,7 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerFixerViewModel = hiltVi
             }, label = "Timer"
         ) { targetCount ->
             Text(
-                if (targetCount > 60) (targetCount / 1000).toString() else targetCount.toString(),
+                if (targetCount > 120) (targetCount / 1000).toString() else targetCount.toString(),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = ButtonBackgroundColor
