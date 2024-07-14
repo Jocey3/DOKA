@@ -74,7 +74,7 @@ fun SaturationScreen(
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-                bottom.linkTo(bottomPanel.top)
+                bottom.linkTo(parent.bottom)
             })
 
         MainFrame(
@@ -87,8 +87,8 @@ fun SaturationScreen(
                     height = Dimension.fillToConstraints
                     width = Dimension.fillToConstraints
                 }
-                .padding(horizontal = 16.dp)
-                .padding(top = 32.dp),
+                .padding(horizontal = 32.dp)
+                .padding(top = 64.dp),
             sharedVM = sharedVM
         )
 
