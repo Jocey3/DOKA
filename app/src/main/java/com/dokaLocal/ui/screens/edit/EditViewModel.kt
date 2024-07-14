@@ -83,8 +83,9 @@ class EditViewModel @Inject constructor(
         _zoom.floatValue = newZoom
     }
 
-    fun updateAngle(newAngle: Float) {
-        _angle.floatValue = newAngle
+    fun updateAngle() {
+        if (angle.value < 360f) _angle.floatValue += 90f
+        else _angle.floatValue = 90f
     }
 
     private fun deletePicture() {

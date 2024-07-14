@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -216,21 +217,36 @@ fun BottomPanel(
         Spacer(modifier = Modifier.width(16.dp))
         TouchPanel(modifier = Modifier.weight(1f), sharedVM = sharedVM)
         Spacer(modifier = Modifier.width(16.dp))
-        Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
-            contentDescription = "Button Next",
-            modifier = Modifier
-                .clickable {
-                    sharedVM.savedImagesSettings.value = ImageSettings(
-                        viewModel.zoom.value,
-                        viewModel.angle.value,
-                        viewModel.offset.value!!.x,
-                        viewModel.offset.value!!.y
-                    )
-                    sharedVM.imageSize = viewModel.realImageSize.value
-                    navigateNext()
-                }
-        )
+        Column {
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.svg_check),
+                contentDescription = "Button Next",
+                modifier = Modifier
+                    .clickable {
+                        sharedVM.savedImagesSettings.value = ImageSettings(
+                            viewModel.zoom.value,
+                            viewModel.angle.value,
+                            viewModel.offset.value!!.x,
+                            viewModel.offset.value!!.y
+                        )
+                        sharedVM.imageSize = viewModel.realImageSize.value
+                        navigateNext()
+                    }
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_rotation),
+                contentDescription = "Rotate",
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .clickable {
+                        viewModel.updateAngle()
+                    }
+            )
+        }
+
     }
 }
 
@@ -258,7 +274,7 @@ fun TouchPanel(
                             val summed = viewModel.offset.value!! + gesturePan
                             viewModel.updateOffset(summed)
                         } else {
-                            viewModel.updateAngle(viewModel.angle.value + gestureRotate)
+//                            viewModel.updateAngle(viewModel.angle.value + gestureRotate)
                             viewModel.updateZoom(newScale)
                         }
                     }
