@@ -79,13 +79,77 @@ class EditViewModel @Inject constructor(
         }
     }
 
+
     fun updateZoom(newZoom: Float) {
         _zoom.floatValue = newZoom
     }
 
     fun updateAngle() {
-        if (angle.value < 360f) _angle.floatValue += 90f
-        else _angle.floatValue = 90f
+        when (angle.value) {
+            0f, 360f -> {
+                _angle.floatValue = 90f
+                _realImageSize.value = realImageSize.value!!.copy(
+                    width = realImageSize.value!!.height,
+                    height = realImageSize.value!!.width,
+                    widthDp = realImageSize.value!!.heightDp,
+                    heightDp = realImageSize.value!!.widthDp
+                )
+                updateOffset(
+                    Offset(
+                        offset.value!!.x + ((realImageSize.value!!.height - realImageSize.value!!.width) / 2),
+                        offset.value!!.y - ((realImageSize.value!!.height - realImageSize.value!!.width) / 2)
+                    )
+                )
+            }
+
+            90f -> {
+                _angle.floatValue = 180f
+                _realImageSize.value = realImageSize.value!!.copy(
+                    width = realImageSize.value!!.height,
+                    height = realImageSize.value!!.width,
+                    widthDp = realImageSize.value!!.heightDp,
+                    heightDp = realImageSize.value!!.widthDp
+                )
+                updateOffset(
+                    Offset(
+                        offset.value!!.x - ((realImageSize.value!!.width - realImageSize.value!!.height) / 2),
+                        offset.value!!.y + ((realImageSize.value!!.width - realImageSize.value!!.height) / 2)
+                    )
+                )
+            }
+
+            180f -> {
+                _angle.floatValue = 270f
+                _realImageSize.value = realImageSize.value!!.copy(
+                    width = realImageSize.value!!.height,
+                    height = realImageSize.value!!.width,
+                    widthDp = realImageSize.value!!.heightDp,
+                    heightDp = realImageSize.value!!.widthDp
+                )
+                updateOffset(
+                    Offset(
+                        offset.value!!.x + ((realImageSize.value!!.height - realImageSize.value!!.width) / 2),
+                        offset.value!!.y - ((realImageSize.value!!.height - realImageSize.value!!.width) / 2)
+                    )
+                )
+            }
+
+            270f -> {
+                _angle.floatValue = 0f
+                _realImageSize.value = realImageSize.value!!.copy(
+                    width = realImageSize.value!!.height,
+                    height = realImageSize.value!!.width,
+                    widthDp = realImageSize.value!!.heightDp,
+                    heightDp = realImageSize.value!!.widthDp
+                )
+                updateOffset(
+                    Offset(
+                        offset.value!!.x - ((realImageSize.value!!.width - realImageSize.value!!.height) / 2),
+                        offset.value!!.y + ((realImageSize.value!!.width - realImageSize.value!!.height) / 2)
+                    )
+                )
+            }
+        }
     }
 
     private fun deletePicture() {

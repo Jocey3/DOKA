@@ -57,6 +57,7 @@ import com.dokaLocal.ui.theme.DOKATheme
 import com.dokaLocal.ui.theme.RudeDark
 import com.dokaLocal.ui.theme.RudeMid
 import com.dokaLocal.ui.theme.TextSimpleColor
+import com.dokaLocal.util.rotate
 import kotlinx.coroutines.delay
 
 
@@ -160,22 +161,21 @@ fun MainFrame(
 @Composable
 fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(modifier = modifier) {
-        val image = remember { sharedVM.currentBitmap }
+        val image =
+            remember { sharedVM.currentBitmap!!.rotate(sharedVM.savedImagesSettings.value.rotation) }
 
-        image?.let {
-            Image(
-                bitmap = it.asImageBitmap(),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        scaleX = sharedVM.savedImagesSettings.value.zoom
-                        scaleY = sharedVM.savedImagesSettings.value.zoom
-                        rotationZ = sharedVM.savedImagesSettings.value.rotation
-                    },
-                contentDescription = "Image for edit",
-                contentScale = ContentScale.Fit
-            )
-        }
+        Image(
+            bitmap = image.asImageBitmap(),
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    scaleX = sharedVM.savedImagesSettings.value.zoom
+                    scaleY = sharedVM.savedImagesSettings.value.zoom
+                },
+            contentDescription = "Image for edit",
+            contentScale = ContentScale.Fit
+        )
+
     }
 }
 

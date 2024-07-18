@@ -1,5 +1,7 @@
 package com.dokaLocal.ui.screens.edit
 
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,6 +53,7 @@ import com.dokaLocal.ui.theme.DOKATheme
 import com.dokaLocal.ui.theme.RudeDark
 import com.dokaLocal.ui.theme.RudeLight
 import com.dokaLocal.ui.theme.RudeMid
+import com.dokaLocal.util.rotate
 
 
 @Composable
@@ -129,15 +132,27 @@ fun MainFrame(
             val imageFrameWidthDp: Dp = with(density) { imageFrameWidth.toDp() }
             val imageFrameHeightDp: Dp = with(density) { imageFrameHeight.toDp() }
 
-            viewModel.setImageFrameSize(
-                imageFrameWidth,
-                imageFrameHeight,
-                imageFrameWidthDp,
-                imageFrameHeightDp
-            )
+
+            if (sharedVM.savedImagesSettings.value.rotation == 0f || sharedVM.savedImagesSettings.value.rotation == 180f)
+                viewModel.setImageFrameSize(
+                    imageFrameWidth,
+                    imageFrameHeight,
+                    imageFrameWidthDp,
+                    imageFrameHeightDp
+                )
+            else
+                viewModel.setImageFrameSize(
+                    imageFrameHeight,
+                    imageFrameWidth,
+                    imageFrameHeightDp,
+                    imageFrameWidthDp
+                )
 
             sharedVM.currentBitmap?.let {
-                viewModel.setRealImageSize(it.width, it.height, density)
+                if (sharedVM.savedImagesSettings.value.rotation == 0f || sharedVM.savedImagesSettings.value.rotation == 180f)
+                    viewModel.setRealImageSize(it.width, it.height, density)
+                else
+                    viewModel.setRealImageSize(it.height, it.width, density)
             }
             viewModel.realImageSize.value?.let {
                 val startX = ((constraints.maxWidth - it.width) / 2)
@@ -172,20 +187,35 @@ fun FrameWithImage(
 ) {
     Box(modifier = modifier) {
         sharedVM.currentBitmap?.let {
+            val picture = it.rotate(viewModel.angle.value)
             Image(
-                bitmap = it.asImageBitmap(),
+                bitmap = picture.asImageBitmap(),
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
                         scaleX = viewModel.zoom.value
                         scaleY = viewModel.zoom.value
-                        rotationZ = viewModel.angle.value
                     },
                 contentDescription = "Image for edit",
                 contentScale = ContentScale.Fit
             )
         }
     }
+}
+
+fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
+    val matrix = Matrix().apply {
+        postRotate(degrees)
+    }
+    return Bitmap.createBitmap(
+        bitmap,
+        0,
+        0,
+        bitmap.width,
+        bitmap.height,
+        matrix,
+        true
+    )
 }
 
 @Composable

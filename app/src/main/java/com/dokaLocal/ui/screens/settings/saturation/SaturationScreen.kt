@@ -50,6 +50,7 @@ import com.dokaLocal.ui.theme.RudeMid
 import com.dokaLocal.ui.theme.TextSimpleColor
 import com.dokaLocal.util.changeBitmapSaturationOld
 import com.dokaLocal.util.loadCompressedBitmap
+import com.dokaLocal.util.rotate
 
 @Composable
 fun SaturationScreen(
@@ -134,13 +135,12 @@ fun FrameWithImage(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
     Box(modifier = modifier) {
         sharedVM.currentBitmap?.let {
             Image(
-                bitmap = it.asImageBitmap(),
+                bitmap = it.rotate(sharedVM.savedImagesSettings.value.rotation).asImageBitmap(),
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
                         scaleX = sharedVM.savedImagesSettings.value.zoom
                         scaleY = sharedVM.savedImagesSettings.value.zoom
-                        rotationZ = sharedVM.savedImagesSettings.value.rotation
                     },
                 contentDescription = "Image for edit",
                 contentScale = ContentScale.Fit

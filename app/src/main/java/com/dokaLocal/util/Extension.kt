@@ -81,6 +81,22 @@ fun Bitmap.negative(): Bitmap {
     return Bitmap.createBitmap(pixels, width, height, Config.ARGB_8888)
 }
 
+fun Bitmap.rotate(degrees: Float): Bitmap {
+    val matrix = Matrix().apply {
+        postRotate(degrees)
+    }
+    return Bitmap.createBitmap(
+        this,
+        0,
+        0,
+        width,
+        height,
+        matrix,
+        true
+    )
+}
+
+
 private fun scaleBitmapTo(
     destinationHeight: Int,
     destinationWidth: Int,
@@ -211,4 +227,6 @@ fun textTintFormat(value: Float): String {
     }
     return formatted
 }
+
+
 

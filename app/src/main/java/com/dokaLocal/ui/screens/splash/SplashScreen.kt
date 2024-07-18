@@ -116,10 +116,12 @@ fun BottomPanel(
     ) {
         Spacer(modifier = Modifier.weight(1f))
         ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Load image") {
+            sharedVM.clearData()
             navigateNext()
         }
         Spacer(modifier = Modifier.weight(1f))
         ButtonDefault(text = "Select Photo") {
+            sharedVM.clearData()
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
         Spacer(modifier = Modifier.weight(1f))
