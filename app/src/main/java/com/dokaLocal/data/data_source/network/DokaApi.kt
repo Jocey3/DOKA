@@ -7,7 +7,7 @@ import retrofit2.http.GET
 
 interface DokaApi {
 
-    @GET("pictures")
+    @GET("photoupload1")
     suspend fun getPicture(): Response<ResponseBody>
 
     @DELETE("delete")
