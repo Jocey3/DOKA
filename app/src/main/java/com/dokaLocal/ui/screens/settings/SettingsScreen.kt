@@ -40,8 +40,9 @@ import com.dokaLocal.MainViewModel
 import com.dokaLocal.R
 import com.dokaLocal.ui.theme.ButtonBackgroundColor
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeMid
+import com.dokaLocal.ui.theme.MainBackgroundColor
+import com.dokaLocal.ui.theme.BottomPanelColor
+import com.dokaLocal.ui.theme.DefaultColor
 import com.dokaLocal.util.rotate
 
 
@@ -60,7 +61,7 @@ fun SettingsScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
         Spacer(modifier = Modifier
@@ -178,7 +179,7 @@ fun BottomPanel(
         modifier = modifier
             .fillMaxSize()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
@@ -217,7 +218,7 @@ fun BottomPanel(
                         text = buttonList[index].title,
                         fontSize = 14.sp,
                         maxLines = 1,
-                        color = ButtonBackgroundColor,
+                        color = DefaultColor,
                         overflow = TextOverflow.Ellipsis
                     )
                 }

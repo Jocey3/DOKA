@@ -45,8 +45,8 @@ import com.dokaLocal.MainViewModel
 import com.dokaLocal.R
 import com.dokaLocal.ui.theme.ButtonBackgroundColor
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeMid
+import com.dokaLocal.ui.theme.MainBackgroundColor
+import com.dokaLocal.ui.theme.BottomPanelColor
 import com.dokaLocal.ui.theme.TextSimpleColor
 import com.dokaLocal.util.changeBitmapSaturationOld
 import com.dokaLocal.util.loadCompressedBitmap
@@ -65,7 +65,7 @@ fun SaturationScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
 
@@ -165,7 +165,7 @@ fun BottomPanel(
         modifier = modifier
             .fillMaxSize()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
@@ -256,7 +256,7 @@ fun SaturationSlider(
                         text = String.format("%.2f", viewModel.saturation.floatValue),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = RudeDark
+                        color = MainBackgroundColor
                     )
                 }
             },

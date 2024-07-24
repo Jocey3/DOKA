@@ -12,21 +12,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dokaLocal.MainViewModel
 import com.dokaLocal.R
+import com.dokaLocal.ui.theme.BottomPanelColor
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeMid
+import com.dokaLocal.ui.theme.DefaultColor
+import com.dokaLocal.ui.theme.MainBackgroundColor
 import com.dokaLocal.util.ButtonDefault
 
 
@@ -44,7 +48,7 @@ fun DoneScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (doneView, bottomPanel) = createRefs()
         Box(modifier = Modifier
@@ -102,12 +106,22 @@ fun BottomPanel(
             .fillMaxWidth()
             .fillMaxHeight()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
 
     ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+            text = "Wash photo for 2 minutes",
+            fontSize = 20.sp,
+            color = DefaultColor,
+            maxLines = 1,
+            fontWeight = FontWeight.SemiBold
+        )
         Spacer(modifier = Modifier.weight(1f))
         ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Select new photo") {
             sharedVM.clearData()

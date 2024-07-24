@@ -5,6 +5,7 @@ import android.graphics.Matrix
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -49,10 +50,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.dokaLocal.ImageSettings
 import com.dokaLocal.MainViewModel
 import com.dokaLocal.R
+import com.dokaLocal.ui.theme.BottomPanelColor
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeLight
-import com.dokaLocal.ui.theme.RudeMid
+import com.dokaLocal.ui.theme.MainBackgroundColor
+import com.dokaLocal.ui.theme.TouchPanelFrameColor
 import com.dokaLocal.util.rotate
 
 
@@ -70,7 +71,7 @@ fun EditScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
 
@@ -231,7 +232,7 @@ fun BottomPanel(
         modifier = modifier
             .fillMaxSize()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
@@ -267,7 +268,7 @@ fun BottomPanel(
             Spacer(modifier = Modifier.weight(1f))
 
             Image(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_rotation),
+                imageVector = ImageVector.vectorResource(id = R.drawable.svg_rotation),
                 contentDescription = "Rotate",
                 modifier = Modifier
                     .padding(bottom = 16.dp)
@@ -291,8 +292,13 @@ fun TouchPanel(
             .padding(bottom = 16.dp)
             .fillMaxSize()
             .background(
-                color = RudeLight,
-                shape = RoundedCornerShape(8.dp)
+                color = MainBackgroundColor,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = TouchPanelFrameColor,
+                shape = RoundedCornerShape(10.dp) // Set the corner radius
             )
             .pointerInput(Unit) {
                 detectTransformGestures(

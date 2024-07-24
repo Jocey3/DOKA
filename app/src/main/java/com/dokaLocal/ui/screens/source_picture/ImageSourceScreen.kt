@@ -13,9 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,7 +31,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,11 +38,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dokaLocal.MainViewModel
+import com.dokaLocal.ui.theme.BottomPanelColor
+import com.dokaLocal.ui.theme.ButtonBackgroundColor
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeMid
-import com.dokaLocal.ui.theme.TextCancelColor
-import com.dokaLocal.ui.theme.TextSimpleColor
+import com.dokaLocal.ui.theme.DarkTextColor
+import com.dokaLocal.ui.theme.MainBackgroundColor
 
 
 @Composable
@@ -62,7 +59,7 @@ fun ImageSourceScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (bottomPanel) = createRefs()
         Box(
@@ -71,8 +68,10 @@ fun ImageSourceScreen(
                     bottom.linkTo(parent.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    height = Dimension.percent(0.25f) // Set height to 1/4 of the screen
+                    height = Dimension.percent(0.25f)
+                    // Set height to 1/4 of the screen
                 }
+                .padding(bottom = 42.dp)
         ) {
             BottomPanel(
                 Modifier.align(Alignment.BottomCenter),
@@ -94,29 +93,6 @@ fun BottomPanel(
     sharedVM: MainViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-//    val lifecycleOwner = LocalLifecycleOwner.current
-//
-//    val pickMedia = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.PickVisualMedia()
-//    ) { uri ->
-//        try {
-//            val inputStream = uri?.let { context.contentResolver?.openInputStream(it) }
-//            if (inputStream != null) {
-//                try {
-//                    val inputStream = uri.let { context.contentResolver?.openInputStream(it) }
-//                    if (inputStream != null) {
-//                        sharedVM.currentBitmap =
-//                            BitmapFactory.decodeStream(inputStream).adjustedImage()
-//                        navigateNext.invoke()
-//                    }
-//                } catch (e: IOException) {
-//                    e.printStackTrace()
-//                }
-//            }
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//        }
-//    }
 
     LaunchedEffect(viewModel.state.message) {
         viewModel.state.message?.let {
@@ -128,18 +104,14 @@ fun BottomPanel(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
+            .fillMaxSize()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(16.dp)
 
     ) {
-//        ButtonDefault(text = "Select Photo") {
-//            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-//        }
         if (viewModel.state.isLoading) {
             CustomCircularProgressIndicator(
                 modifier = Modifier
@@ -148,20 +120,28 @@ fun BottomPanel(
             )
             Text(
                 modifier = Modifier
-                    .padding(top = 24.dp, bottom = 31.dp),
-                fontSize = 16.sp,
-                text = "Waiting for the image from the server",
-                color = TextSimpleColor
+                    .padding(top = 21.dp, bottom = 34.dp),
+                fontSize = 24.sp,
+                text = "Loading",
+                color = ButtonBackgroundColor
             )
-            Text(
-                modifier = Modifier
-                    .clickable { navigateBack() }
-                    .padding(bottom = 16.dp),
-                fontSize = 20.sp,
-                text = "Cancel",
-                fontWeight = FontWeight.Bold,
-                color = TextCancelColor
-            )
+            Box(
+                modifier = modifier
+                    .height(46.dp)
+                    .width(231.dp)
+                    .background(ButtonBackgroundColor, shape = RoundedCornerShape(40.dp))
+                    .clickable {
+                        navigateBack()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    text = "Cancel",
+                    fontSize = 24.sp,
+                    color = DarkTextColor
+                )
+            }
         } else {
             sharedVM.currentBitmap = viewModel.state.picture
             navigateNext.invoke()

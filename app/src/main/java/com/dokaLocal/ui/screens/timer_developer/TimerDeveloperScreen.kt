@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,10 +46,10 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dokaLocal.MainViewModel
 import com.dokaLocal.R
+import com.dokaLocal.ui.theme.BottomPanelColor
 import com.dokaLocal.ui.theme.ButtonBackgroundColor
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeMid
+import com.dokaLocal.ui.theme.MainBackgroundColor
 import com.dokaLocal.ui.theme.TextSimpleColor
 
 
@@ -72,7 +75,7 @@ fun TimerDeveloperScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (bottomPanel) = createRefs()
 
@@ -107,7 +110,7 @@ fun BottomPanel(
         modifier = modifier
             .fillMaxSize()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
@@ -119,7 +122,7 @@ fun BottomPanel(
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max)
                 .background(
-                    color = RudeMid,
+                    color = BottomPanelColor,
                     shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
                 )
         ) {
@@ -187,12 +190,32 @@ fun Timer(modifier: Modifier = Modifier, viewModel: TimerDeveloperViewModel = hi
                 )
             }, label = "Timer"
         ) { targetCount ->
-            Text(
-                if (targetCount > 120) (targetCount / 1000).toString() else targetCount.toString(),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = ButtonBackgroundColor
-            )
+            val digits =
+                if (targetCount > 120) (targetCount / 1000).toInt() else targetCount.toInt()
+            val digitList = digits.toString().map { num -> num.toString().toInt() }
+            Row {
+                for (digit in digitList) {
+                    val drawableId = when (digit) {
+                        0 -> R.drawable.svg_digit_0
+                        1 -> R.drawable.svg_digit_1
+                        2 -> R.drawable.svg_digit_2
+                        3 -> R.drawable.svg_digit_3
+                        4 -> R.drawable.svg_digit_4
+                        5 -> R.drawable.svg_digit_5
+                        6 -> R.drawable.svg_digit_6
+                        7 -> R.drawable.svg_digit_7
+                        8 -> R.drawable.svg_digit_8
+                        9 -> R.drawable.svg_digit_9
+                        else -> R.drawable.svg_digit_0
+                    }
+                    Image(
+                        painter = painterResource(id = drawableId),
+                        contentDescription = "Digit $digit",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(86.dp)
+                    )
+                }
+            }
         }
     }
 }

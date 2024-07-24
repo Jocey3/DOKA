@@ -10,13 +10,13 @@
         android:pathData="M159.99,82C159.99,38.92 125.07,4 81.99,4C38.91,4 3.99,38.92 3.99,82C3.99,125.08 38.91,160 81.99,160C125.07,160 159.99,125.08 159.99,82Z"
         android:strokeWidth="8"
         android:fillColor="#00000000"
-        android:strokeColor="#6D2C2C"/>
+        android:strokeColor="#B20202"/>
     <path
         android:pathData="M53.99,82L73.99,102L113.99,62"
         android:strokeLineJoin="round"
         android:strokeWidth="14"
         android:fillColor="#00000000"
-        android:strokeColor="#AE2D2D"
+        android:strokeColor="#B20202"
         android:strokeLineCap="round"/>
   </group>
 </vector>

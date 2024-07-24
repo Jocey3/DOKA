@@ -3,6 +3,7 @@ package com.dokaLocal.ui.screens.exposure
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +31,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -39,12 +42,12 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dokaLocal.MainViewModel
 import com.dokaLocal.R
+import com.dokaLocal.ui.theme.BottomPanelColor
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.FrameInnerColor
-import com.dokaLocal.ui.theme.RedText
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeMid
-import com.dokaLocal.util.ButtonDefault
+import com.dokaLocal.ui.theme.InstructionFrameColor
+import com.dokaLocal.ui.theme.InstructionTextColor
+import com.dokaLocal.ui.theme.MainBackgroundColor
+import com.dokaLocal.ui.theme.DefaultColor
 import com.dokaLocal.util.negative
 import kotlin.math.roundToInt
 
@@ -61,7 +64,7 @@ fun ExposureScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (mainFrame, middle, bottomPanel) = createRefs()
 
@@ -145,14 +148,19 @@ fun MainFrame(modifier: Modifier = Modifier, sharedVM: MainViewModel) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(width = 179.dp, height = 127.dp)
-                    .background(FrameInnerColor)
+                    .background(MainBackgroundColor)
+                    .border(
+                        width = 2.dp, color = InstructionFrameColor,
+                        shape = RoundedCornerShape(8.dp)
+                    )
                     .padding(2.dp)
                     .clip(RectangleShape)
             ) {
                 Text(
                     text = "Place photo paper here",
                     fontSize = 20.sp,
-                    color = RedText,
+                    color = InstructionTextColor,
+                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(vertical = 30.dp, horizontal = 20.dp)
@@ -176,7 +184,7 @@ fun BottomPanel(
         modifier = modifier
             .fillMaxSize()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
@@ -188,7 +196,7 @@ fun BottomPanel(
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max)
                 .background(
-                    color = RudeMid,
+                    color = BottomPanelColor,
                     shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
                 )
         ) {
@@ -209,13 +217,26 @@ fun BottomPanel(
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        ButtonDefault(
-            modifier = Modifier
-                .fillMaxWidth(), text = "Expose"
+        Box(
+            modifier = modifier
+                .height(70.dp)
+                .width(241.dp)
+                .background(MainBackgroundColor, shape = RoundedCornerShape(40.dp))
+                .border(1.dp, color = DefaultColor, shape = RoundedCornerShape(40.dp))
+                .clickable {
+                    sharedVM.beforeExposure = sharedVM.currentBitmap
+                    sharedVM.currentBitmap = sharedVM.currentBitmap?.negative()
+                    navigateExpose()
+                },
+            contentAlignment = Alignment.Center
         ) {
-            sharedVM.beforeExposure = sharedVM.currentBitmap
-            sharedVM.currentBitmap = sharedVM.currentBitmap?.negative()
-            navigateExpose()
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                text = "Expose",
+                fontSize = 24.sp,
+                color = DefaultColor,
+                fontWeight = FontWeight.SemiBold
+            )
         }
         Spacer(modifier = Modifier.weight(1f))
     }

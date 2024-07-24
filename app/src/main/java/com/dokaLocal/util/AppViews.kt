@@ -21,14 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dokaLocal.ui.theme.ButtonBackgroundColor
 import com.dokaLocal.ui.theme.ButtonTextColor
-import com.dokaLocal.ui.theme.RedClick
+import com.dokaLocal.ui.theme.DefaultColor
 
 @Composable
 fun ButtonDefault(modifier: Modifier = Modifier, text: String, listener: () -> Unit) {
     var selected by remember { mutableStateOf(false) }
     val color = remember { Animatable(ButtonBackgroundColor) }
     LaunchedEffect(selected) {
-        color.animateTo(if (selected) RedClick else ButtonBackgroundColor)
+        color.animateTo(if (selected) DefaultColor else ButtonBackgroundColor)
     }
     Box(
         modifier = modifier

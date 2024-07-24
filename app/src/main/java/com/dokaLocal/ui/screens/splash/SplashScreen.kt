@@ -26,8 +26,8 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dokaLocal.MainViewModel
 import com.dokaLocal.ui.theme.DOKATheme
-import com.dokaLocal.ui.theme.RudeDark
-import com.dokaLocal.ui.theme.RudeMid
+import com.dokaLocal.ui.theme.MainBackgroundColor
+import com.dokaLocal.ui.theme.BottomPanelColor
 import com.dokaLocal.util.ButtonDefault
 import com.dokaLocal.util.adjustedImage
 import java.io.IOException
@@ -49,7 +49,7 @@ fun SplashScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(RudeDark)
+            .background(MainBackgroundColor)
     ) {
         val (bottomPanel) = createRefs()
         Box(
@@ -108,7 +108,7 @@ fun BottomPanel(
             .fillMaxWidth()
             .fillMaxHeight()
             .background(
-                color = RudeMid,
+                color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
             .padding(vertical = 16.dp, horizontal = 30.dp)
