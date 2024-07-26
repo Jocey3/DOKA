@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -109,21 +110,26 @@ fun BottomPanel(
                 color = BottomPanelColor,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
             )
-            .padding(vertical = 16.dp, horizontal = 30.dp)
+            .padding(vertical = 16.dp)
 
     ) {
         Text(
             modifier = Modifier
-                .fillMaxWidth()
+                .wrapContentWidth()
                 .padding(horizontal = 40.dp),
             text = "Wash photo for 2 minutes",
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             color = DefaultColor,
             maxLines = 1,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.weight(1f))
-        ButtonDefault(modifier = Modifier.fillMaxWidth(), text = "Select new photo") {
+        ButtonDefault(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 30.dp),
+            text = "Select new photo"
+        ) {
             sharedVM.clearData()
             navigateNext()
         }
@@ -132,7 +138,10 @@ fun BottomPanel(
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(
+    showBackground = true, showSystemUi = true,
+    device = "spec:width=411dp,height=901dp,dpi=420"
+)
 @Composable
 fun GreetingPreview() {
     DOKATheme {
